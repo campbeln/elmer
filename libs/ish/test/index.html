@@ -1,0 +1,140 @@
+<!DOCTYPE>
+<html lang="en">
+<head>
+    <title>Test Suite</title>
+    <META HTTP-EQUIV="Access-Control-Allow-Origin" CONTENT="http://some.url">
+</head>
+<body id="thebody">
+    Test
+
+
+    <script type="text/javascript" src="chai.js"></script>
+
+    <script type="text/javascript" src="../ish-polyfill.js"></script>
+    <script type="text/javascript" src="../ish.js"
+        ish='{ "target": "ish", "plugins": { "import": ["ish.type.date-format","ish.io.fs","ish.io.csv"], "baseUrl": "../", "cache": false } }'
+    ></script>
+    <script type="text/javascript" src="../ish.type-ex.js"></script>
+    <script type="text/javascript" src="../ish.type.enum.js"></script>
+    <script type="text/javascript" src="../ish.type.obj.pojo.js"></script>
+    <script type="text/javascript" src="../ish.io.net.js"></script>
+    <script type="text/javascript" src="../ish.io.net-xhr.js"></script>
+    <script type="text/javascript" src="../ish.io.web.js"></script>
+    <script type="text/javascript" src="../ish.ui.dom.js"></script>
+    <script type="text/javascript" src="../ish.io.punycode.js"></script>
+    <script type="text/javascript" src="../ish.type.arr.pagination.js"></script>
+    <script type="text/javascript" src="../ish.io.daemon.js"></script>
+    <script type="text/javascript" src="../ish.io.evaler.js"></script>
+
+    <script type="text/javascript" src="ish.test.js"></script>
+    <script type="text/javascript" src="ish.test.type-ex.js"></script>
+
+    <object id="neek" type="text/html" data="temp.html"></object>
+    <!--
+    <script type="text/javascript" src="ish.ui.clipboard.js"></script>
+    <script type="text/javascript" src="ish.ui.tooltip.js"></script>
+    -->
+
+    <style>
+        INPUT.input-select,
+        SELECT.input-select {
+            border: 2px solid teal;
+
+            padding: 5px;
+            font-size: 16px;
+            line-height: 1;
+            height: 34px;
+        }
+            INPUT.input-select {
+                border-left: none;
+                margin-left: -5px;
+                padding-left: 10px;
+            }
+            SELECT.input-select {
+                border-right: none;
+                background: url(img/select_down.png) no-repeat right #ddd;
+                background-color: silver;
+
+                width: 168px;
+                -webkit-appearance: none;
+                background-position-x: 144px;
+            }
+    </style>
+
+    <select class="input-select">
+        <option>1</option>
+        <option>2</option>
+        <option>3</option>
+        <option>4</option>
+        <option>5</option>
+    </select>
+    <input type="text" placeholder="neek" class="input-select">
+
+    <script type="text/javascript">
+        console.log(document.getElementById("neek").innerHTML);
+
+        ish.type.enum.load({
+            clients: {}, //# Stub for client-specific values
+
+            noteTypes: [
+                { val: undefined, desc: "system" },
+                { val: 1, desc: "user" },
+                { val: 2, desc: "email" },
+                { val: 3, desc: "sms" },
+                { val: 100, desc: "warning" },
+                { val: 101, desc: "error" }
+            ]
+        });
+
+        ish.type.enum.load({
+            clients: {
+                clientCo: {
+                    status: [
+                        { val: undefined, desc: "Undefined" },
+                        { val: 1, desc: "Pending" },
+                        { val: 2, desc: "InProcess" },
+                        { val: 3, desc: "Paid" },
+                        { val: 4, desc: "Failed" },
+
+                        { val: 12, desc: "InLimbo" },
+                        { val: 13, desc: "VerifyPaid" },
+                        { val: 90, desc: "UnpaidNonDDI" }
+                    ],
+
+                    errors: [
+                        { val: undefined, desc: "Undefined" },
+                        { val: 1, desc: "RequestNotValid" },
+                        { val: 2, desc: "SecretKeyNotValid" },
+                        { val: 3, desc: "UnknownDomainException" },
+                        { val: 4, desc: "PayoutNotFound" },
+                        { val: 5, desc: "DebugLogError" },
+                        { val: 6, desc: "CurrencyNotSupported" },
+                        { val: 7, desc: "PaperworkNotFound" },
+                        { val: 8, desc: "TransactionAlreadyExists" },
+                        { val: 9, desc: "ApiNotAccessible" },
+                        { val: 10, desc: "InternalServerError" },
+                        { val: 11, desc: "ValidationFailed" },
+                        { val: 12, desc: "DifferentCurrency" },
+                        { val: 13, desc: "PayoutClosed" },
+                        { val: 14, desc: "AddPayoutError" },
+                        { val: 15, desc: "DriverIsDisabled" },
+
+                        { val: 100, desc: "DbConnError" }
+                    ],
+
+                    /*type: [
+                        { val: undefined, desc: "Unset" },
+                        { val: 1, desc: "Regular" },
+                        { val: 2, desc: "RegularLateAdd" },
+                        { val: 4, desc: "Immediate" }
+                    ],*/
+
+                    currency: [
+                        { val: "USD", desc: "us" }
+                    ]
+                }
+            }
+        });
+    </script>
+</body>
+</html>
