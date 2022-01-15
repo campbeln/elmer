@@ -139,6 +139,7 @@ module.exports = function ($app) {
         });
     }); //# /login/*
 
-
+    //#
+    $app.app.services.web.router.register($router, "login", false);
     return $router;
 };

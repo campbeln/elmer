@@ -1,18 +1,8 @@
-module.exports = function ($app, $httpServer) {
+module.exports = function ($app) {
     'use strict';
 
     let $router = $app.app.services.router();
 
-    //#
-    function registerRoute(sRoute, bSecure) {
-        let $router = require("./" + sRoute + ".js")($app);
-
-        //#
-        if (bSecure) {
-            $httpServer.use("/" + sRoute, require("../middleware/auth.js")($app));
-        }
-        $httpServer.use("/" + sRoute, $router);
-    } //# registerRoute
 
     //# Setup the root/heartbeat route
     $router.get("/", (oRequest, oResponse) => {
@@ -23,9 +13,11 @@ module.exports = function ($app, $httpServer) {
         });
     }); //# "/"
 
-    //# .use the various $routers in our $httpServer
-    $httpServer.use("/", $router);
-    registerRoute("login", false);
-    registerRoute("example", true);
-    $httpServer.use("/example2", require("./example.js")($app));
+
+    //#
+    $app.app.services.web.router.register($router, "", false);
+    $app.app.services.fs.requireDir("routes", ["_router.js"]);
+
+    //#
+    $app.app.services.web.server.use("/example2", require("./example.js")($app));
 };

@@ -28,7 +28,7 @@ const $app = require("./libs/ish/ish.js");
 //# Configure the $app
 //##################################################
 //# Pull in our .config then setup our $app
-require("./app/app.js")($app, $express);
+require("./app/app.js")($app, $express, $httpServer);
 $app.app.config = $app.extend(require($app.app.config.args[0] || "./app/config/prod.js"));
 
 
@@ -37,11 +37,10 @@ $app.app.config = $app.extend(require($app.app.config.args[0] || "./app/config/p
 //##################################################
 //# Support compressed bodies
 $httpServer.use($compression({
-    filter: (request, response) => {
-        return (
-            request.headers['x-no-compression'] ?
+    filter: (oRequest, oResponse) => {
+        return (oRequest.headers['x-no-compression'] ?
             false :
-            $compression.filter(request, response)
+            $compression.filter(oRequest, oResponse)
         );
     },
     threshold: 0
@@ -84,4 +83,4 @@ $httpServer.listen($app.app.config.port, "127.0.0.1", () => {
 //##################################################
 //# Configure the routes
 //##################################################
-require("./app/routes/_routes.js")($app, $httpServer);
+require("./app/routes/_routes.js")($app);
