@@ -2,7 +2,7 @@
 module.exports = function($app) {
     'use strict';
 
-    let $router = $app.app.services.router();
+    let $router = $app.app.services.web.router();
 
 
     //# curl -X GET http://localhost:3000/example/byid/123 -H 'Content-Type: application/json' -H 'Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNuIiwicm9sZSI6MCwiaWF0IjoxNjQwODQ3NzAwLCJleHAiOjE2NDA4NTEzMDB9.pGwQnctoytxpozWJPVlibkwCv1YauWhckKY7HFuHpC4'

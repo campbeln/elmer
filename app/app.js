@@ -3,11 +3,11 @@
 //const $formidable = require('formidable');
 //const $url = require('url');
 const $fs = require('fs');
-const { app } = require('../libs/ish/ish');
+const $fetch = require('node-fetch-commonjs');
 
 module.exports = function ($app, $express, $httpServer) {
     $app.app = {
-        version: "0.2.2022-01-14",
+        version: "0.2.2022-01-19",
 
         data: {},
         enums: {
@@ -30,6 +30,28 @@ module.exports = function ($app, $express, $httpServer) {
                 },*/
                 express: $express,
                 server: $httpServer,
+                proxy: function (sProxyURL, sRemovePrefixFromPath) {
+                    let sRemovePrefixFromPath = $app.type.str.mk(sRemovePrefixFromPath),
+                        bRemovePrefix = (sRemovePrefixFromPath !== "")
+                    ;
+
+                    //#
+                    if (bRemovePrefix) {
+                        sRemovePrefixFromPath = (sRemovePrefixFromPath[0] === "/" ? "" : "/") + sRemovePrefixFromPath;
+                    }
+
+                    //#
+                    //# https://stackoverflow.com/questions/18432779/piping-remote-file-in-expressjs/66991063#66991063
+                    return function (oRequest, oResponse) {
+                        let sURL = sProxyURL + oRequest.url;
+                        sURL = (bRemovePrefix ? sURL.replace(sRemovePrefixFromPath, "") : sURL);
+
+                        $fetch(sURL).then((oActual) => {
+                            oActual.headers.forEach((sValue, sName) => oResponse.setHeader(sName, sValue));
+                            oActual.body.pipe(oResponse);
+                        });
+                    };
+                },
                 router: (function(){
                     let a_oRegisteredRoutes = [];
 
@@ -114,7 +136,7 @@ module.exports = function ($app, $express, $httpServer) {
                                 }
 
                                 return (bRouteExists &&
-                                    arguments.length === 1 || $app.type.bool.mk(bSecure, false) === oRoute.secure
+                                    (arguments.length === 1 || $app.type.bool.mk(bSecure, false) === oRoute.secure)
                                 );
                             }, //# router.registered
                         }

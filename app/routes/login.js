@@ -3,7 +3,7 @@
 const $jwt = require('jsonwebtoken');
 
 module.exports = function ($app) {
-    let $router = $app.app.services.router();
+    let $router = $app.app.services.web.router();
 
     //#
     async function login(oRequest, oResponse, eMode) {

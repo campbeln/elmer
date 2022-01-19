@@ -1,7 +1,7 @@
 module.exports = function ($app) {
     'use strict';
 
-    let $router = $app.app.services.router();
+    let $router = $app.app.services.web.router();
 
 
     //# Setup the root/heartbeat route
