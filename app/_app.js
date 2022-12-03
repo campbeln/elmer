@@ -99,7 +99,7 @@ module.exports = async function ($app, $express, $httpServer) {
                             }, oRoute);
                         }, //# router.register
 
-                        registered: function(sRoute /*, bSecure*/) {
+                        registered: function(sRoute, bSecure) {
                             let oRoute,
                                 bRouteExists = false
                             ;
@@ -110,7 +110,9 @@ module.exports = async function ($app, $express, $httpServer) {
                                 bRouteExists = $app.type.obj.is(oRoute, true);
                             }
 
-                            return (bRouteExists && arguments.length === 1); //# (arguments.length === 1 || $app.type.bool.mk(bSecure, false) === oRoute.secure));
+                            return (bRouteExists &&
+                                (arguments.length === 1 || $app.type.bool.mk(bSecure, false) === oRoute.secure)
+                            );
                         } //# router.registered
                     }
                 );

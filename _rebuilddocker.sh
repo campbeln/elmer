@@ -11,7 +11,7 @@ for keyval in  $(grep -E '": [^\{]' ./app/config/base.json | sed -e 's/: /=/' -e
 done;
 
 docker build . -t $dockerBaseName/$dockerBaseName
-if [$baseElmer == "true"]
+if [[ $baseElmer == "true" ]];
 then
     docker run --net=$net --hostname $name.$hostname -p $portLocal:$port -d $dockerBaseName/$name
 else

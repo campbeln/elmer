@@ -52,7 +52,9 @@ module.exports = function ($app) {
 
                 //# Overload the existing $app.app.services.web.router with our baseElmer version
                 router: (function() {
-                    let a_oRegisteredRoutes = [];
+                    let a_oRegisteredRoutes = [],
+                        fnOrigRegistered = $app.app.services.web.router.registered
+                    ;
 
                     return $app.extend(
                         function() {
@@ -89,6 +91,8 @@ module.exports = function ($app) {
                             return $returnVal;
                         }, //# services.web.router
                         {
+                            registered: fnOrigRegistered,
+
                             register: function(vRouterOrURL, sRoute, bSecure) {
                                 let $router, oRoute, sProxyURL, bRemovePrefix,
                                     sRemovePrefixFromPath = $app.type.str.mk(sRoute),
@@ -149,23 +153,7 @@ module.exports = function ($app) {
                                     created: !bRouteExists,
                                     securityMismatch: (oRoute.secure !== bSecure)
                                 }, oRoute);
-                            }, //# router.register
-
-                            registered: function(sRoute, bSecure) {
-                                let oRoute,
-                                    bRouteExists = false
-                                ;
-
-                                //#
-                                if ($app.type.str.is(sRoute)) {
-                                    oRoute = $app.type.query(a_oRegisteredRoutes, { route: sRoute }, { firstEntryOnly: true, caseInsensitive: true });
-                                    bRouteExists = $app.type.obj.is(oRoute, true);
-                                }
-
-                                return (bRouteExists &&
-                                    (arguments.length === 1 || $app.type.bool.mk(bSecure, false) === oRoute.secure)
-                                );
-                            } //# router.registered
+                            } //# router.register
                         }
                     );
                 }())

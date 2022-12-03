@@ -10,10 +10,13 @@ for keyval in  $(grep -E '": [^\{]' ./app/config/base.json | sed -e 's/: /=/' -e
     #echo $keyval | sed 's/"//g' >> ./docker.env
 done;
 
-if [$baseElmer != "true"]
+if [[ $baseElmer == "true" ]];
 then
-    cp ../baseapijwt/app/routes/_route.js ./app/routes/
-    cp ../baseapijwt/app/_app.js ./app/
-    cp ../baseapijwt/_index.js .
-    cp ../baseapijwt/_rebuilddocker.sh .
+    noop
+else
+    cp ../elmer/app/routes/_routes.js ./app/routes/
+    cp ../elmer/app/_app.js ./app/
+    cp ../elmer/_index.js .
+    cp ../elmer/_rebuilddocker.sh .
+    cp ../elmer/_syncElmerBase.sh .
 fi
