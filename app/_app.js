@@ -1,15 +1,23 @@
+//##################################################
+//#
+//#            ** BASE VERSION **
+//#
+//##################################################
+//# Version: 2022-10-30
 'use strict';
 
-//const $formidable = require('formidable');
+//const $formidable = require('formidable');        //# multipartForm support
 //const $url = require('url');
 const $fs = require('fs');
-const $fetch = require('node-fetch-commonjs');
+//const $fetch = require('node-fetch-commonjs');
+let $expressProxy = require('express-http-proxy');
 
-module.exports = function ($app, $express, $httpServer) {
+module.exports = async function ($app, $express, $httpServer, $bodyParser) {
     $app.app = {
-        version: "0.2.2022-01-19",
+        version: "0.2.2022-10-30",
 
         data: {},
+        cache: {},
         enums: {
             userTypes: {
                 admin: 0,
@@ -30,10 +38,15 @@ module.exports = function ($app, $express, $httpServer) {
                 },*/
                 express: $express,
                 server: $httpServer,
+                bodyParser: $bodyParser,
                 proxy: function (sProxyURL, sRemovePrefixFromPath) {
-                    let sRemovePrefixFromPath = $app.type.str.mk(sRemovePrefixFromPath),
-                        bRemovePrefix = (sRemovePrefixFromPath !== "")
-                    ;
+                    /*
+                    let bRemovePrefix;
+
+                    //#
+                    sProxyURL = $app.type.str.mk(sProxyURL);
+                    sRemovePrefixFromPath = $app.type.str.mk(sRemovePrefixFromPath);
+                    bRemovePrefix = (sRemovePrefixFromPath !== "");
 
                     //#
                     if (bRemovePrefix) {
@@ -43,14 +56,23 @@ module.exports = function ($app, $express, $httpServer) {
                     //#
                     //# https://stackoverflow.com/questions/18432779/piping-remote-file-in-expressjs/66991063#66991063
                     return function (oRequest, oResponse) {
-                        let sURL = sProxyURL + oRequest.url;
+                        let sURL = "http://" + sProxyURL + oRequest.url;
                         sURL = (bRemovePrefix ? sURL.replace(sRemovePrefixFromPath, "") : sURL);
 
-                        $fetch(sURL).then((oActual) => {
-                            oActual.headers.forEach((sValue, sName) => oResponse.setHeader(sName, sValue));
-                            oActual.body.pipe(oResponse);
-                        });
+                        try {
+                            $fetch(sURL).then((oActual) => {
+                                oActual.headers.forEach((sValue, sName) => oResponse.setHeader(sName, sValue));
+                                oActual.body.pipe(oResponse);
+                            });
+                        } catch (e) {
+                            console.log(e);
+                        }
                     };
+                    */
+                },
+                register: async function() {
+                    //# curl -X GET http://localhost:$portLocal/
+                    return await $app.io.net.get("http://" + $app.config.name + "." + $app.config.hostname + ":" + $app.config.port + "/?register=true");
                 },
                 router: (function(){
                     let a_oRegisteredRoutes = [];
@@ -63,15 +85,20 @@ module.exports = function ($app, $express, $httpServer) {
                             $returnVal.use((oRequest, oResponse, fnContinue) => {
                                 let sOrigin = oRequest.headers.origin;
 
+                                //console.log("sOrigin: [" + sOrigin + "]", oRequest.headers);
+
                                 //# If the oRequest is from a .corsWhitelist sOrigin we trust, set the CORS header
                                 if ($app.app.config.security.corsWhitelist.indexOf(sOrigin) > -1) {
                                     oResponse.setHeader('Access-Control-Allow-Origin', sOrigin);
                                 }
+                                /*else {
+                                    oResponse.setHeader('Access-Control-Allow-Origin', '*');
+                                }*/
                                 //oResponse.setHeader('Access-Control-Allow-Origin', '*');
 
                                 //# Setup the other required headers then fnContinue the oRequest through the proper $route
                                 //#     NOTE: CRUD = POST,GET/POST,PUT,DELETE
-                                oResponse.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE');
+                                oResponse.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE'); //# PATCH,HEAD,OPTIONS
                                 oResponse.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Authorization');
                                 oResponse.setHeader('Access-Control-Allow-Credentials', true);
 
@@ -85,10 +112,24 @@ module.exports = function ($app, $express, $httpServer) {
                             return $returnVal;
                         }, //# services.web.router
                         {
-                            register: function($router, sRoute, bSecure) {
-                                let oRoute,
+                            register: function(vRouterOrURL, sRoute, bSecure) {
+                                let $router, oRoute, sProxyURL, bRemovePrefix,
+                                    sRemovePrefixFromPath = $app.type.str.mk(sRoute),
                                     bRouteExists = false
                                 ;
+
+                                if ($app.type.str.is(vRouterOrURL)) {
+                                    sProxyURL = $app.type.str.mk(vRouterOrURL);
+                                }
+                                else {
+                                    $router = vRouterOrURL;
+                                }
+                                bRemovePrefix = (sRemovePrefixFromPath !== "");
+
+                                //#
+                                if (bRemovePrefix) {
+                                    sRemovePrefixFromPath = (sRemovePrefixFromPath[0] === "/" ? "" : "/") + sRemovePrefixFromPath;
+                                }
 
                                 //#
                                 bSecure = $app.type.bool.mk(bSecure, false);
@@ -100,12 +141,22 @@ module.exports = function ($app, $express, $httpServer) {
 
                                     //#
                                     if (!bRouteExists) {
-                                        //$router = require("./" + sRoute + ".js")($app);
-
                                         //#
                                         if (bSecure) {
-                                            $httpServer.use("/" + sRoute, require(__dirname + "/middleware/auth.js")($app));
+                                            $httpServer.use("/" + sRoute, require(__dirname + "/app/middleware/auth.js")($app));
                                         }
+
+                                        //#
+                                        //# https://stackoverflow.com/questions/49017240/express-js-proxy-to-call-web-api
+                                        if ($app.type.str.mk(sProxyURL)) {
+                                            let sURL = "http://" + sProxyURL; // + oRequest.url
+                                            sURL = (bRemovePrefix ? sURL.replace(sRemovePrefixFromPath, "") : sURL);
+                                            $router = $expressProxy(sURL, {
+                                                parseReqBody: false
+                                            });
+                                        }
+                                        $httpServer.use("/" + sRoute, require(__dirname + "/app/middleware/cache.js")($app, sRoute));
+                                        //$httpServer.use("/" + sRoute, $bodyParser.raw());
                                         $httpServer.use("/" + sRoute, $router);
 
                                         //#
@@ -138,27 +189,40 @@ module.exports = function ($app, $express, $httpServer) {
                                 return (bRouteExists &&
                                     (arguments.length === 1 || $app.type.bool.mk(bSecure, false) === oRoute.secure)
                                 );
-                            }, //# router.registered
+                            } //# router.registered
                         }
                     );
                 }())
             },
             fs: {
                 fs: $fs,
-                requireDir: function(sDir, a_sExcludeFiles) {
+                baseDir: __dirname + "/../",
+                requireDir: function(sDir, a_sExcludeFiles, fnCallback) {
                     //#
                     sDir = $app.type.str.mk(sDir);
                     sDir = (sDir[0] !== "/" ? "/" : "") + sDir;
                     a_sExcludeFiles = $app.type.arr.mk(a_sExcludeFiles);
 
                     //#
+                    fnCallback = $app.type.fn.mk(fnCallback, function(fnRequiredFile /*, sFileName, sRelativePath*/) {
+                        fnRequiredFile($app);
+                    });
+
+                    //#
                     $app.app.services.fs.fs.readdirSync(__dirname + sDir).forEach(function(sFile) {
+                        let oFS = {
+                            file: sFile,
+                            dir: __dirname + sDir + "/",
+                            path: __dirname + sDir + "/" + sFile,
+                            url: sDir.replace(/^\/routes/i, "") + $app.type.str.mk(sFile).replace(/\.js$/i, "")
+                        };
+
                         if (a_sExcludeFiles.indexOf(sFile) === -1) {
-                            require(__dirname + sDir + "/" + sFile)($app);
+                            fnCallback(require(oFS.path), oFS);
                         }
                     });
                 }
-            }
+            } //# $app.app.services.fs
         },
 
         log: {

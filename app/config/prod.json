@@ -1,0 +1,17 @@
+{
+    "port": 3000,
+
+    "security": {
+        "jwtSecret": "ZR3LeYIKKk/84J6icxbcBG2vi/TGgGmfQPF8hSEQfqBS1Vt20/v0YXRfzSTEakenDXtNy5sFu+dJ6P08PBj3P7hgFqEDMpXSv3KuSvp06D/GGWxEPT0zUljd57IRG3URLG+yGOPi1nfCwXPmJojJ8QplpKHAs6J8zc3bu8kFwVw=",
+        "localSecret": "AD4YtI5RqqRQNYtdw4kpc0DAfsLX4lnzfzOGPu3+Hv4P6U8ap5Q8F3nOGHiLsKI6HdEsjr9IWcRUva8awqeZX2lOKWIUcxNproH9l+hvZVXEdiiFQ2vrRAKaCl6Z0H5BZ7CmA59LusTQ+sZ5ZFK0rS/8dM82/VbkoUOmB5kbDGA=",
+        "publicSecret": {
+            "admin":        "UI1+RUM9e39ZEVjN6/ZW/aJw44uQbrla8BWarJyfxV8=",
+            "internal":     "yH2ZW3XLzH+USlQDOlGggqzA8aQ+PeaHSHKvk4LXHzs=",
+            "external":     "kL+VklPUFycajjj3DqaxJ2COsX6ndTG8VH5TIIZsSdg=",
+        },
+        "corsWhitelist": [
+            "http://localhost",
+            "http://localhost:3000",
+        ]
+    }
+}
