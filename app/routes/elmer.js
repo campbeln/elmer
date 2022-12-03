@@ -2,21 +2,6 @@
 module.exports = function($app, $router /*, $baseRouter */) {
     'use strict';
 
-    //$router = $app.app.services.web.router();
-
-
-    //# curl -X GET http://localhost:3000/elmer/byid/123 -H 'Content-Type: application/json' -H 'Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNuIiwicm9sZSI6MCwiaWF0IjoxNjQwODQ3NzAwLCJleHAiOjE2NDA4NTEzMDB9.pGwQnctoytxpozWJPVlibkwCv1YauWhckKY7HFuHpC4'
-    //# curl -X GET http://localhost:3000/elmer/byid/letters -H 'Content-Type: application/json' -H 'Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNuIiwicm9sZSI6MCwiaWF0IjoxNjQwODQ3NzAwLCJleHAiOjE2NDA4NTEzMDB9.pGwQnctoytxpozWJPVlibkwCv1YauWhckKY7HFuHpC4'
-    //# curl -X GET http://localhost:3000/elmer/byid/123 -H 'Content-Type: application/json'
-    //# curl -X GET http://localhost:3000/elmer2/byid/123 -H 'Content-Type: application/json'
-    //# curl -X GET http://localhost:3000/elmer2/byid/123 -H 'Content-Type: application/json'
-    $router.get('/byid/:id', async (oRequest, oResponse) => {
-        var iID = $app.type.int.mk(oRequest.params.id);
-        //const $fetch = require('node-fetch-common.js');
-
-        oResponse.status(200).json({ id: iID, boilerplate: true });
-    });
-
 
     //#
     $router.get('/cache/:route', async (oRequest, oResponse) => {
@@ -108,10 +93,11 @@ module.exports = function($app, $router /*, $baseRouter */) {
                 if (dCurrentWhen && $app.type.date.cmp(dCurrentWhen, dBefore) < 0) {
                     a_oSubroute.splice(i, 1);
                 }
-            }
-            //# Else we are to clear the entire sSubroute
-            else {
-                delete $app.cache[sRoute][sSubroute];
+                //# TODO: neek
+                //# Else we are to clear the entire sSubroute
+                else {
+                    delete $app.cache[sRoute][sSubroute];
+                }
             }
         }
 
@@ -123,7 +109,4 @@ module.exports = function($app, $router /*, $baseRouter */) {
     });
 
 
-
-    //#
-    //return $router;
 }; //# module.exports
