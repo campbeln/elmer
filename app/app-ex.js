@@ -169,6 +169,35 @@ module.exports = function ($app) {
                         }
                     );
                 }())
+            },
+
+            //# TODO: Old code version probably no longer needed
+            fs: {
+                requireDir: function(sDir, a_sExcludeFiles, fnCallback) {
+                    //#
+                    sDir = $app.type.str.mk(sDir);
+                    sDir = (sDir[0] !== "/" ? "/" : "") + sDir;
+                    a_sExcludeFiles = $app.type.arr.mk(a_sExcludeFiles);
+
+                    //#
+                    fnCallback = $app.type.fn.mk(fnCallback, function(fnRequiredFile /*, sFileName, sRelativePath*/) {
+                        fnRequiredFile($app);
+                    });
+
+                    //#
+                    $app.app.services.fs.fs.readdirSync(__dirname + sDir).forEach(function(sFile) {
+                        let oFS = {
+                            file: sFile,
+                            dir: __dirname + sDir + "/",
+                            path: __dirname + sDir + "/" + sFile,
+                            url: sDir.replace(/^\/routes/i, "") + $app.type.str.mk(sFile).replace(/\.js$/i, "")
+                        };
+
+                        if (a_sExcludeFiles.indexOf(sFile) === -1) {
+                            fnCallback(require(oFS.path), oFS);
+                        }
+                    });
+                }
             }
         }
     });

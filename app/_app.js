@@ -15,7 +15,7 @@ const $ip = require('ip');
 
 module.exports = async function ($app, $express, $httpServer) {
     $app.app = {
-        version: "0.2.2022-10-30",
+        version: "0.2.2022-12-03",
 
         data: {},
         config: {
@@ -53,7 +53,7 @@ module.exports = async function ($app, $express, $httpServer) {
                     //# curl -X GET http://localhost:$portLocal/
                     return await $app.io.net.get("http://" + $app.app.config.name + "." + $app.app.config.hostname + ":" + $app.app.config.port + "/?register=true");
                 }
-            },
+            }, //# $app.app.services.web
 
             router: (function() {
                 let a_oRegisteredRoutes = [];
@@ -119,39 +119,49 @@ module.exports = async function ($app, $express, $httpServer) {
             fs: {
                 fs: $fs,
                 baseDir: __dirname + "/../",
+
+                //#
                 requireDir: function(sDir, a_sExcludeFiles, fnCallback) {
+                    let requireDirRecurse = function (sPath, sDirectory) {
+                        $app.app.services.fs.fs.readdirSync(sPath).forEach(function(sFile) {
+                            let oFS = {
+                                file: sFile,
+                                dir: sPath + "/",
+                                path: sPath + "/" + sFile,
+                                url: sDirectory.replace(/^\/routes/i, "") + $app.type.str.mk(sFile).replace(/\.js$/i, "")
+                            };
+
+                            //#
+                            if ($app.app.services.fs.fs.lstatSync(oFS.path).isDirectory()) {
+                                requireDirRecurse(oFS.path, sFile + "/");
+                            }
+                            //#
+                            else if ($app.type.str.is(sFile, true) && a_sExcludeFiles.indexOf(sFile) === -1) {
+                                fnCallback(require(oFS.path), oFS);
+                            }
+                        });
+                    }; //# requireDirRecurse
+
                     //#
                     sDir = $app.type.str.mk(sDir);
                     sDir = (sDir[0] !== "/" ? "/" : "") + sDir;
                     a_sExcludeFiles = $app.type.arr.mk(a_sExcludeFiles);
-
-                    //#
-                    fnCallback = $app.type.fn.mk(fnCallback, function(fnRequiredFile /*, sFileName, sRelativePath*/) {
+                    fnCallback = $app.type.fn.mk(fnCallback, function (fnRequiredFile /*, oFS*/) {
                         fnRequiredFile($app);
                     });
 
-                    //#
-                    $app.app.services.fs.fs.readdirSync(__dirname + sDir).forEach(function(sFile) {
-                        let oFS = {
-                            file: sFile,
-                            dir: __dirname + sDir + "/",
-                            path: __dirname + sDir + "/" + sFile,
-                            url: sDir.replace(/^\/routes/i, "") + $app.type.str.mk(sFile).replace(/\.js$/i, "")
-                        };
-
-                        if (a_sExcludeFiles.indexOf(sFile) === -1) {
-                            fnCallback(require(oFS.path), oFS);
-                        }
-                    });
-                }
+                    //# Kick off the recursive process
+                    requireDirRecurse(__dirname + sDir, sDir);
+                } //# $app.app.services.fs.requireDir
             } //# $app.app.services.fs
-        },
+
+        }, //# $app.app.services
 
         log: {
             api: function (oData, oRequest) {
                 //# oData = { status, json, error }
             }
-        },
+        }, //# $app.app.log
 
         error: {
             response: function (oResponse, vErrorMessage, iHTTPCode) {
