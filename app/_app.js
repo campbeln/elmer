@@ -3,28 +3,21 @@
 //#            ** BASE VERSION **
 //#
 //##################################################
-//# Version: 2022-10-30
+//# Version: 2022-12-03
 'use strict';
 
 //const $formidable = require('formidable');        //# multipartForm support
 //const $url = require('url');
 const $fs = require('fs');
 //const $fetch = require('node-fetch-commonjs');
-let $expressProxy = require('express-http-proxy');
+const $ip = require('ip');
 
-module.exports = async function ($app, $express, $httpServer, $bodyParser) {
+
+module.exports = async function ($app, $express, $httpServer) {
     $app.app = {
         version: "0.2.2022-10-30",
 
         data: {},
-        cache: {},
-        enums: {
-            userTypes: {
-                admin: 0,
-                internal: 1,
-                external: 2
-            }
-        },
         config: {
             //# Remove `node index.js` from process.argv (NOTE: ignores any flags sent to `node`)
             args: process.argv.slice(2)
@@ -33,167 +26,96 @@ module.exports = async function ($app, $express, $httpServer, $bodyParser) {
         services: { //# collection of external services
             web: {
                 //url: $url,
-                /*multipartForm: function () {
-                    return new $formidable.IncomingForm();
+                /*multipartForm: function (oRequest, fnPerFile) {
+                    let $form = new $formidable.IncommingForm(),
+                        iMB = (1024 * 1024)
+                    ;
+
+                    //$form.maxFileSize = 200 * iMB;
+                    $form.multiples = true;
+
+                    $form.parse(oReuest);
+
+                    $form.on('fileBegin', function (name, file){
+                        file.path = __dirname + '/_uploads/' + file.name;
+                    });
+
+                    $form.on('file', function (name, file){
+                        console.log('Uploaded ' + file.name);
+                    });
+
+                    //oRequest.sendFile(__dirname + '/index.html');  //return new $formidable.IncomingForm();
                 },*/
                 express: $express,
                 server: $httpServer,
-                bodyParser: $bodyParser,
-                proxy: function (sProxyURL, sRemovePrefixFromPath) {
-                    /*
-                    let bRemovePrefix;
-
-                    //#
-                    sProxyURL = $app.type.str.mk(sProxyURL);
-                    sRemovePrefixFromPath = $app.type.str.mk(sRemovePrefixFromPath);
-                    bRemovePrefix = (sRemovePrefixFromPath !== "");
-
-                    //#
-                    if (bRemovePrefix) {
-                        sRemovePrefixFromPath = (sRemovePrefixFromPath[0] === "/" ? "" : "/") + sRemovePrefixFromPath;
-                    }
-
-                    //#
-                    //# https://stackoverflow.com/questions/18432779/piping-remote-file-in-expressjs/66991063#66991063
-                    return function (oRequest, oResponse) {
-                        let sURL = "http://" + sProxyURL + oRequest.url;
-                        sURL = (bRemovePrefix ? sURL.replace(sRemovePrefixFromPath, "") : sURL);
-
-                        try {
-                            $fetch(sURL).then((oActual) => {
-                                oActual.headers.forEach((sValue, sName) => oResponse.setHeader(sName, sValue));
-                                oActual.body.pipe(oResponse);
-                            });
-                        } catch (e) {
-                            console.log(e);
-                        }
-                    };
-                    */
-                },
-                register: async function() {
+                ip: $ip,
+                register: async function () {
                     //# curl -X GET http://localhost:$portLocal/
-                    return await $app.io.net.get("http://" + $app.config.name + "." + $app.config.hostname + ":" + $app.config.port + "/?register=true");
-                },
-                router: (function(){
-                    let a_oRegisteredRoutes = [];
+                    return await $app.io.net.get("http://" + $app.app.config.name + "." + $app.app.config.hostname + ":" + $app.app.config.port + "/?register=true");
+                }
+            },
 
-                    return $app.extend(
-                        function() {
-                            let $returnVal = $express.Router();
+            router: (function() {
+                let a_oRegisteredRoutes = [];
 
-                            //# Configure our .router to use CORS
-                            $returnVal.use((oRequest, oResponse, fnContinue) => {
-                                let sOrigin = oRequest.headers.origin;
+                return $app.extend(
+                    function() {
+                        return $express.Router();
+                    }, //# services.web.router
+                    {
+                        register: function($router, sRoute /*, bSecure*/) {
+                            let oRoute,
+                                bRouteExists = false
+                            ;
 
-                                //console.log("sOrigin: [" + sOrigin + "]", oRequest.headers);
+                            //#
+                            //bSecure = $app.type.bool.mk(bSecure, false);
 
-                                //# If the oRequest is from a .corsWhitelist sOrigin we trust, set the CORS header
-                                if ($app.app.config.security.corsWhitelist.indexOf(sOrigin) > -1) {
-                                    oResponse.setHeader('Access-Control-Allow-Origin', sOrigin);
-                                }
-                                /*else {
-                                    oResponse.setHeader('Access-Control-Allow-Origin', '*');
-                                }*/
-                                //oResponse.setHeader('Access-Control-Allow-Origin', '*');
-
-                                //# Setup the other required headers then fnContinue the oRequest through the proper $route
-                                //#     NOTE: CRUD = POST,GET/POST,PUT,DELETE
-                                oResponse.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE'); //# PATCH,HEAD,OPTIONS
-                                oResponse.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type,Authorization');
-                                oResponse.setHeader('Access-Control-Allow-Credentials', true);
-
-                                //# Parse the .querystring and attach it to our oRequest
-                                //oRequest.querystring = $app.app.services.url.parse(oRequest.url, true).query;
-                                oRequest.querystring = $app.io.web.queryString.parse(oRequest.url);
-
-                                fnContinue();
-                            }); //# CORS
-
-                            return $returnVal;
-                        }, //# services.web.router
-                        {
-                            register: function(vRouterOrURL, sRoute, bSecure) {
-                                let $router, oRoute, sProxyURL, bRemovePrefix,
-                                    sRemovePrefixFromPath = $app.type.str.mk(sRoute),
-                                    bRouteExists = false
-                                ;
-
-                                if ($app.type.str.is(vRouterOrURL)) {
-                                    sProxyURL = $app.type.str.mk(vRouterOrURL);
-                                }
-                                else {
-                                    $router = vRouterOrURL;
-                                }
-                                bRemovePrefix = (sRemovePrefixFromPath !== "");
+                            //#
+                            if ($app.type.str.is(sRoute)) {
+                                oRoute = $app.type.query(a_oRegisteredRoutes, { route: sRoute }, { firstEntryOnly: true, caseInsensitive: true });
+                                bRouteExists = $app.type.obj.is(oRoute, true);
 
                                 //#
-                                if (bRemovePrefix) {
-                                    sRemovePrefixFromPath = (sRemovePrefixFromPath[0] === "/" ? "" : "/") + sRemovePrefixFromPath;
-                                }
-
-                                //#
-                                bSecure = $app.type.bool.mk(bSecure, false);
-
-                                //#
-                                if ($app.type.str.is(sRoute)) {
-                                    oRoute = $app.type.query(a_oRegisteredRoutes, { route: sRoute }, { firstEntryOnly: true, caseInsensitive: true });
-                                    bRouteExists = $app.type.obj.is(oRoute, true);
+                                if (!bRouteExists) {
+                                    //#
+                                    /*if (bSecure) {
+                                        $httpServer.use("/" + sRoute, require(__dirname + "/app/middleware/auth.js")($app));
+                                    }*/
+                                    $httpServer.use("/" + sRoute, $router);
 
                                     //#
-                                    if (!bRouteExists) {
-                                        //#
-                                        if (bSecure) {
-                                            $httpServer.use("/" + sRoute, require(__dirname + "/app/middleware/auth.js")($app));
-                                        }
-
-                                        //#
-                                        //# https://stackoverflow.com/questions/49017240/express-js-proxy-to-call-web-api
-                                        if ($app.type.str.mk(sProxyURL)) {
-                                            let sURL = "http://" + sProxyURL; // + oRequest.url
-                                            sURL = (bRemovePrefix ? sURL.replace(sRemovePrefixFromPath, "") : sURL);
-                                            $router = $expressProxy(sURL, {
-                                                parseReqBody: false
-                                            });
-                                        }
-                                        $httpServer.use("/" + sRoute, require(__dirname + "/app/middleware/cache.js")($app, sRoute));
-                                        //$httpServer.use("/" + sRoute, $bodyParser.raw());
-                                        $httpServer.use("/" + sRoute, $router);
-
-                                        //#
-                                        oRoute = {
-                                            route: sRoute,
-                                            secure: bSecure,
-                                            router: $router
-                                        };
-                                        a_oRegisteredRoutes.push(oRoute);
-                                    }
+                                    oRoute = {
+                                        route: sRoute,
+                                        //secure: bSecure,
+                                        router: $router
+                                    };
+                                    a_oRegisteredRoutes.push(oRoute);
                                 }
+                            }
 
-                                return app.extend({
-                                    created: !bRouteExists,
-                                    securityMismatch: (oRoute.secure !== bSecure)
-                                }, oRoute);
-                            }, //# router.register
+                            return app.extend({
+                                created: !bRouteExists
+                            }, oRoute);
+                        }, //# router.register
 
-                            registered: function(sRoute, bSecure) {
-                                let oRoute,
-                                    bRouteExists = false
-                                ;
+                        registered: function(sRoute /*, bSecure*/) {
+                            let oRoute,
+                                bRouteExists = false
+                            ;
 
-                                //#
-                                if ($app.type.str.is(sRoute)) {
-                                    oRoute = $app.type.query(a_oRegisteredRoutes, { route: sRoute }, { firstEntryOnly: true, caseInsensitive: true });
-                                    bRouteExists = $app.type.obj.is(oRoute, true);
-                                }
+                            //#
+                            if ($app.type.str.is(sRoute)) {
+                                oRoute = $app.type.query(a_oRegisteredRoutes, { route: sRoute }, { firstEntryOnly: true, caseInsensitive: true });
+                                bRouteExists = $app.type.obj.is(oRoute, true);
+                            }
 
-                                return (bRouteExists &&
-                                    (arguments.length === 1 || $app.type.bool.mk(bSecure, false) === oRoute.secure)
-                                );
-                            } //# router.registered
-                        }
-                    );
-                }())
-            },
+                            return (bRouteExists && arguments.length === 1); //# (arguments.length === 1 || $app.type.bool.mk(bSecure, false) === oRoute.secure));
+                        } //# router.registered
+                    }
+                );
+            }()),
+
             fs: {
                 fs: $fs,
                 baseDir: __dirname + "/../",

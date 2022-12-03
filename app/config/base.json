@@ -1,4 +1,6 @@
 {
+    "baseElmer": true,
+
     "name": "api",
     "portLocal": 45000,
     "secure": false,

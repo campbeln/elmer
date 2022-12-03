@@ -3,7 +3,7 @@
 //#            ** BASE VERSION **
 //#
 //##################################################
-//# Version: 2022-10-30
+//# Version: 2022-12-03
 'use strict';
 
 //##################################################
@@ -15,6 +15,7 @@ const $httpServer = $express();
 const $cookieParser = require('cookie-parser');
 const $bodyParser = require("body-parser");
 const $compression = require('compression');
+//const $formidable = require('formidable');
 
 //# .require ishJS + extensions
 //#     TODO: NPM-ify ishJS to require("@ish"), require("@ish/io.net"), etc.?
@@ -96,7 +97,8 @@ $httpServer.listen($app.app.config.port, "0.0.0.0", () => {
 //##################################################
 require("./app/routes/_routes.js")($app);
 (async function () {
+    //# curl -X GET http://localhost:$portLocal/
     let oRegister = await $app.app.services.web.register();
-    console.log("# Auto-registered? " + oRegister.register);
+    console.log("# Auto-registered? " + $app.type.bool.mk($app.resolve(oRegister, "json.registered"), false));
     console.log("##############################");
 })();

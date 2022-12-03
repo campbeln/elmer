@@ -13,7 +13,8 @@ COPY package*.json
 #RUN npm config set cafile ./cert.pem
 
 # Install NPM packages
-RUN npm Install# If you are building your code for production
+RUN npm Install
+# If you are building your code for production
 # RUN npm ci --only=production
 
 # Bundle app source
