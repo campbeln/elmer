@@ -3,7 +3,7 @@ const $expressProxy = require('express-http-proxy');
 //#
 module.exports = function ($app) {
     'use strict';
-    $app.app.versionEx = "0.1.2022-12-03";
+    $app.app.versionEx = "0.1.2022-12-04";
 
     //#
     $app.extend($app.app, {
@@ -160,7 +160,7 @@ module.exports = function ($app) {
             },
 
             //# TODO: Old code version probably no longer needed
-            fs: {
+            /*fs: {
                 requireDir: function(sDir, a_sExcludeFiles, fnCallback) {
                     //#
                     sDir = $app.type.str.mk(sDir);
@@ -168,7 +168,7 @@ module.exports = function ($app) {
                     a_sExcludeFiles = $app.type.arr.mk(a_sExcludeFiles);
 
                     //#
-                    fnCallback = $app.type.fn.mk(fnCallback, function(fnRequiredFile /*, sFileName, sRelativePath*/) {
+                    fnCallback = $app.type.fn.mk(fnCallback, function(fnRequiredFile /*, sFileName, sRelativePath* /) {
                         fnRequiredFile($app);
                     });
 
@@ -186,7 +186,7 @@ module.exports = function ($app) {
                         }
                     });
                 }
-            }
+            }*/
         }
     });
 
