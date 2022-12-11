@@ -52,71 +52,72 @@ module.exports = async function ($app, $express, $httpServer) {
                 register: async function () {
                     //# curl -X GET http://localhost:$portLocal/
                     return await $app.io.net.get("http://" + $app.app.config.name + "." + $app.app.config.hostname + ":" + $app.app.config.port + "/?register=true");
-                }
-            }, //# $app.app.services.web
+                },
 
-            router: (function() {
-                let a_oRegisteredRoutes = [];
+                router: (function() {
+                    let a_oRegisteredRoutes = [];
 
-                return $app.extend(
-                    function() {
-                        return $express.Router();
-                    }, //# services.web.router
-                    {
-                        register: function($router, sRoute /*, bSecure*/) {
-                            let oRoute,
-                                bRouteExists = false
-                            ;
-
-                            //#
-                            //bSecure = $app.type.bool.mk(bSecure, false);
-
-                            //#
-                            if ($app.type.str.is(sRoute)) {
-                                oRoute = $app.type.query(a_oRegisteredRoutes, { route: sRoute }, { firstEntryOnly: true, caseInsensitive: true });
-                                bRouteExists = $app.type.obj.is(oRoute, true);
+                    return $app.extend(
+                        function() {
+                            return $express.Router();
+                        }, //# services.web.router
+                        {
+                            register: function($router, sRoute /*, bSecure*/) {
+                                let oRoute,
+                                    bRouteExists = false
+                                ;
 
                                 //#
-                                if (!bRouteExists) {
-                                    //#
-                                    /*if (bSecure) {
-                                        $httpServer.use("/" + sRoute, require(__dirname + "/app/middleware/auth.js")($app));
-                                    }*/
-                                    $httpServer.use("/" + sRoute, $router);
+                                //bSecure = $app.type.bool.mk(bSecure, false);
+
+                                //#
+                                if ($app.type.str.is(sRoute)) {
+                                    oRoute = $app.type.query(a_oRegisteredRoutes, { route: sRoute }, { firstEntryOnly: true, caseInsensitive: true });
+                                    bRouteExists = $app.type.obj.is(oRoute, true);
 
                                     //#
-                                    oRoute = {
-                                        route: sRoute,
-                                        //secure: bSecure,
-                                        router: $router
-                                    };
-                                    a_oRegisteredRoutes.push(oRoute);
+                                    if (!bRouteExists) {
+                                        //#
+                                        /*if (bSecure) {
+                                            $httpServer.use("/" + sRoute, require(__dirname + "/app/middleware/auth.js")($app));
+                                        }*/
+                                        $httpServer.use("/" + sRoute, $router);
+
+                                        //#
+                                        oRoute = {
+                                            route: sRoute,
+                                            //secure: bSecure,
+                                            router: $router
+                                        };
+                                        a_oRegisteredRoutes.push(oRoute);
+                                    }
                                 }
-                            }
 
-                            return app.extend({
-                                created: !bRouteExists
-                            }, oRoute);
-                        }, //# router.register
+                                return app.extend({
+                                    created: !bRouteExists
+                                }, oRoute);
+                            }, //# router.register
 
-                        registered: function(sRoute, bSecure) {
-                            let oRoute,
-                                bRouteExists = false
-                            ;
+                            registered: function(sRoute, bSecure) {
+                                let oRoute,
+                                    bRouteExists = false
+                                ;
 
-                            //#
-                            if ($app.type.str.is(sRoute)) {
-                                oRoute = $app.type.query(a_oRegisteredRoutes, { route: sRoute }, { firstEntryOnly: true, caseInsensitive: true });
-                                bRouteExists = $app.type.obj.is(oRoute, true);
-                            }
+                                //#
+                                if ($app.type.str.is(sRoute)) {
+                                    oRoute = $app.type.query(a_oRegisteredRoutes, { route: sRoute }, { firstEntryOnly: true, caseInsensitive: true });
+                                    bRouteExists = $app.type.obj.is(oRoute, true);
+                                }
 
-                            return (bRouteExists &&
-                                (arguments.length === 1 || $app.type.bool.mk(bSecure, false) === oRoute.secure)
-                            );
-                        } //# router.registered
-                    }
-                );
-            }()),
+                                return (bRouteExists &&
+                                    (arguments.length === 1 || $app.type.bool.mk(bSecure, false) === oRoute.secure)
+                                );
+                            } //# router.registered
+                        }
+                    );
+                }()), //# $app.app.services.web.router
+
+            }, //# $app.app.services.web
 
             fs: {
                 fs: $fs,
