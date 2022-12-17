@@ -362,6 +362,12 @@
                     }
 
                     //#
+                    if (core.type.str.is(oOptions.contentType, true)) {
+                        oOptions.headers = core.type.obj.mk(oOptions.headers);
+                        oOptions.headers["Content-Type"] = oOptions.contentType;
+                    }
+
+                    //#
                     sVerb = core.type.str.mk(sVerb).toUpperCase();
                     sVerb = (["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD"].indexOf(sVerb) === -1 ?
                         "GET" :
