@@ -12,7 +12,7 @@ done;
 
 if [[ $baseElmer == "true" ]];
 then
-    noop
+    echo ""
 else
     cp ../elmer/app/routes/_routes.js ./app/routes/
     cp ../elmer/app/_app.js ./app/
