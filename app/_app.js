@@ -93,7 +93,7 @@ module.exports = async function ($app, $express, $httpServer) {
                                     }
                                 }
 
-                                return app.extend({
+                                return $app.extend({
                                     created: !bRouteExists
                                 }, oRoute);
                             }, //# router.register
