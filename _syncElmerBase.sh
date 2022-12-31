@@ -19,6 +19,7 @@ done;
     cp ../elmer/_index.js .
     cp ../elmer/_rebuilddocker.sh .
     cp ../elmer/_syncElmerBase.sh .
+    cp ../elmer/_logs.sh .
     cp -R ../elmer/libs/ish ./libs/
 #fi
 
