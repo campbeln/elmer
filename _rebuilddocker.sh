@@ -25,6 +25,7 @@ sleep 1
 
 rm ./docker.env
 
+echo ""
 echo "####################"
 echo "# Container Start:"
 echo "####################"
