@@ -21,3 +21,7 @@ done;
     cp ../elmer/_syncElmerBase.sh .
     cp -R ../elmer/libs/ish ./libs/
 #fi
+
+npm update
+npm install
+npm audit fix --force
