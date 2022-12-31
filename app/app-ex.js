@@ -58,7 +58,7 @@ module.exports = function ($app) {
 
                     return $app.extend(
                         function() {
-                            let $returnVal = $express.Router();
+                            let $returnVal = $app.app.services.web.express.Router();
 
                             //# Configure our .router to use CORS
                             $returnVal.use((oRequest, oResponse, fnContinue) => {
@@ -96,6 +96,7 @@ module.exports = function ($app) {
                             register: function(vRouterOrURL, sRoute, bSecure) {
                                 let $router, oRoute, sProxyURL, bRemovePrefix,
                                     sRemovePrefixFromPath = $app.type.str.mk(sRoute),
+                                    $httpServer = $app.app.services.web.server,
                                     bRouteExists = false
                                 ;
 
@@ -149,7 +150,7 @@ module.exports = function ($app) {
                                     }
                                 }
 
-                                return app.extend({
+                                return $app.extend({
                                     created: !bRouteExists,
                                     securityMismatch: (oRoute.secure !== bSecure)
                                 }, oRoute);

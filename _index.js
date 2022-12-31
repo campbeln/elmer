@@ -79,7 +79,7 @@ $httpServer.use($cookieParser());
 //#     NOTE: Cannot bind to 127.0.0.1 as in Docker the server returns with "curl: (52) Empty reply from server"
 $httpServer.listen($app.app.config.port, "0.0.0.0", () => {
     console.log("##############################");
-    console.log("# $app on :" + $app.app.config.port);
+    console.log("# $app on :" + $app.app.config.port + " => " + $app.app.config.portLocal);
     console.log(
         "# started @ " +
             $app.type.date.format(Date.now(), "YYYY/MM/DD hh:mm:ss")
@@ -98,7 +98,9 @@ $httpServer.listen($app.app.config.port, "0.0.0.0", () => {
 require("./app/routes/_routes.js")($app);
 (async function () {
     //# curl -X GET http://localhost:$portLocal/
-    let oRegister = await $app.app.services.web.register();
-    console.log("# Auto-registered? " + $app.type.bool.mk($app.resolve(oRegister, "json.registered"), false));
+    if (!$app.app.config.baseElmer) {
+        let oRegister = await $app.app.services.web.register();
+        console.log("# Auto-registered? " + $app.type.bool.mk($app.resolve(oRegister, "json.registered"), false));
+    }
     console.log("##############################");
 })();
