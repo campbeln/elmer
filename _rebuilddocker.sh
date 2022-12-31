@@ -10,6 +10,7 @@ for keyval in  $(grep -E '": [^\{]' ./app/config/base.json | sed -e 's/: /=/' -e
     echo $keyval | sed 's/"//g' >> ./docker.env
 done;
 
+docker network create api
 docker ps -a | grep $dockerBaseName/$name | awk '{ system("docker container stop " $1) }'
 docker build . -t $dockerBaseName/$name
 if [[ $baseElmer == "true" ]];
@@ -23,5 +24,12 @@ curl -X GET http://localhost:$portLocal/
 sleep 1
 
 rm ./docker.env
+
+echo "####################"
+echo "# Container Start:"
+echo "####################"
+echo ""
+
+docker ps -a | grep $dockerBaseName/$name | awk '{ system("docker container logs " $1) }'
 
 # docker network inspect api
