@@ -10,6 +10,7 @@ for keyval in  $(grep -E '": [^\{]' ./app/config/base.json | sed -e 's/: /=/' -e
     echo $keyval | sed 's/"//g' >> ./docker.env
 done;
 
+docker ps -a | grep $dockerBaseName/$name | awk '{ system("docker container stop " $1) }'
 docker build . -t $dockerBaseName/$name
 if [[ $baseElmer == "true" ]];
 then
