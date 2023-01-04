@@ -6,8 +6,7 @@
 //# Version: 2023-01-04
 'use strict';
 
-import formidable from "formidable";
-const $formidable = formidable; //require('formidable');
+const $formidable = require('formidable');
 const $fs = require('fs');
 const $ip = require('ip');
 //const $url = require('url');
