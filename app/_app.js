@@ -71,7 +71,12 @@ module.exports = async function ($app, $express, $httpServer) {
                         }
                         //# Else this is the first instance of the sField, so set it in oFormData.fields
                         else {
-                            oFormData.files[sField] = oFile;
+                            oFormData.files[sField] = {
+                                file: oFile,
+                                getContent: function () {
+                                    return $fs.readFileSync(oFile.upload.path /*, {encoding:'utf8', flag:'r'}*/);
+                                }
+                            };
                         }
                     });
                     $form.on('end', function() {
