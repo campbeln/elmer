@@ -7,11 +7,11 @@
         "publicSecret": {
             "admin":        "UI1+RUM9e39ZEVjN6/ZW/aJw44uQbrla8BWarJyfxV8=",
             "internal":     "yH2ZW3XLzH+USlQDOlGggqzA8aQ+PeaHSHKvk4LXHzs=",
-            "external":     "kL+VklPUFycajjj3DqaxJ2COsX6ndTG8VH5TIIZsSdg=",
+            "external":     "kL+VklPUFycajjj3DqaxJ2COsX6ndTG8VH5TIIZsSdg="
         },
         "corsWhitelist": [
             "http://localhost",
-            "http://localhost:3000",
+            "http://localhost:3000"
         ]
     }
 }

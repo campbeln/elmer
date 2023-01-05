@@ -137,7 +137,7 @@ module.exports = function ($app) {
                                                 parseReqBody: false
                                             });
                                         }
-                                        $httpServer.use("/" + sRoute, require(__dirname + "/app/middleware/cache.js")($app, sRoute));
+                                        $httpServer.use("/" + sRoute, require(__dirname + "/middleware/cache.js")($app, sRoute));
                                         $httpServer.use("/" + sRoute, $router);
 
                                         //#

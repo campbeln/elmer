@@ -1,5 +1,5 @@
 //#
-module.exports = function($app /*, $baseRouter */) {
+module.exports = function($app, $router /*, $baseRouter */) {
     'use strict';
 
 
