@@ -80,7 +80,8 @@ module.exports = async function ($app, $express, $httpServer) {
                         }
                     });
                     $form.on('end', function() {
-                        fnOnComplete(oFormData);
+                        $app.type.fn.run(fnOnComplete, { args: oFormData });
+                        //fnOnComplete(oFormData);
                     });
                     $form.parse(oRequest);
                 },
