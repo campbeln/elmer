@@ -65,7 +65,7 @@ module.exports = async function ($app, $express, $httpServer) {
                             oFormData.files[sField].push({
                                 file: oFile,
                                 getContent: function () {
-                                    return $fs.readFileSync(oFile.upload.path /*, {encoding:'utf8', flag:'r'}*/);
+                                    return $fs.readFileSync(oFile.filepath /*, {encoding:'utf8', flag:'r'}*/);
                                 }
                             });
                         }
@@ -74,7 +74,7 @@ module.exports = async function ($app, $express, $httpServer) {
                             oFormData.files[sField] = {
                                 file: oFile,
                                 getContent: function () {
-                                    return $fs.readFileSync(oFile.upload.path /*, {encoding:'utf8', flag:'r'}*/);
+                                    return $fs.readFileSync(oFile.filepath /*, {encoding:'utf8', flag:'r'}*/);
                                 }
                             };
                         }

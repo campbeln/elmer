@@ -2540,7 +2540,7 @@
                                     if (core.type.arr.is(a_sCurrentKeys, true)) {
                                         for (j = 0; j < a_sCurrentKeys.length; j++) {
                                             //# If our vTarget already .has the a_sCurrentKeys
-                                            if (core.type.obj.has(vTarget, a_sCurrentKeys[j])) {
+                                            if (core.type.obj.has(vTarget, a_sCurrentKeys[j], false)) {
                                                 //# If vCurrentSource's a_sCurrentKeys .is .arr
                                                 if (core.type.arr.is(vCurrentSource[a_sCurrentKeys[j]], true)) {
                                                     //# If the vTarget's a_sCurrentKeys .is .arr and it's not the same array as in vCurrentSource, concat the values
