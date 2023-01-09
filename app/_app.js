@@ -97,6 +97,7 @@ module.exports = async function ($app, $express, $httpServer) {
                     return await $app.io.net.get("http://" + $app.app.config.name + "." + $app.app.config.hostname + ":" + $app.app.config.port + "/?register=true");
                 },
 
+
                 router: (function() {
                     let a_oRegisteredRoutes = [];
 
