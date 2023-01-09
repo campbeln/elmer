@@ -67,9 +67,10 @@ then
     cp ../elmer/app/routes/_routes.js ./app/routes/
     cp ../elmer/app/_app.js ./app/
     cp ../elmer/_index.js .
-    cp ../elmer/_rebuilddocker.sh .
-    cp ../elmer/_syncElmerBase.sh .
-    cp ../elmer/_logs.sh .
+    cp ../elmer/_tools.sh .
+    rm _rebuilddocker.sh
+    rm _syncElmerBase.sh
+    rm _logs.sh
     cp -R ../elmer/libs/ish ./libs/
 
     npm update
