@@ -3,7 +3,7 @@ const $expressProxy = require('express-http-proxy');
 //#
 module.exports = function ($app) {
     'use strict';
-    $app.app.versionEx = "0.1.2022-12-04";
+    $app.app.versionEx = "0.1.2023-01-08";
 
     //#
     $app.extend($app.app, {
@@ -159,6 +159,7 @@ module.exports = function ($app) {
                     );
                 }())
             },
+
 
             //# TODO: Old code version probably no longer needed
             /*fs: {

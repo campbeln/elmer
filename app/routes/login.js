@@ -133,6 +133,16 @@ module.exports = function ($app) {
     }); //# /login/external
 
     //#
+    $router.post("/app/:baseroute", async (oRequest, oResponse) => {
+        //login(oRequest, oResponse, $app.app.enums.userTypes.external);
+    }); //# /login/app
+
+    //#
+    $router.post("/basic/:baseroute", async (oRequest, oResponse) => {
+        //login(oRequest, oResponse, $app.app.enums.userTypes.external);
+    }); //# /login/basic
+
+    //#
     $router.post('*', (oRequest, oResponse) => {
         oResponse.status(401).json({
             error: 'Incorrect username/password combination.'

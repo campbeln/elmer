@@ -77,30 +77,28 @@ $httpServer.use($cookieParser());
 
 //# Spin-up the $httpServer, barfing out the versions to the console as we go
 //#     NOTE: Cannot bind to 127.0.0.1 as in Docker the server returns with "curl: (52) Empty reply from server"
-$httpServer.listen($app.app.config.port, "0.0.0.0", () => {
+$httpServer.listen($app.app.config.port, "0.0.0.0", async () => {
     console.log("##############################");
-    console.log("# " + $app.app.config.name + " => $app on :" + $app.app.config.port + " => " + $app.app.config.portLocal);
-    console.log(
-        "# started @ " +
-            $app.type.date.format(Date.now(), "YYYY/MM/DD hh:mm:ss")
-    );
+    console.log("# " + $app.app.config.name + " port:" + $app.app.config.port + " (aliased on: " + $app.app.config.portLocal + ")");
+    console.log("# started @ " + $app.type.date.format(Date.now(), "YYYY/MM/DD hh:mm:ss"));
     console.log("#");
     console.log("# ishJS v" + $app.config.ish().ver);
     console.log("# $app.app base v" + $app.app.version);
     console.log("# $app.app this v" + $app.app.versionEx);
     console.log("#");
-});
 
+    //##################################################
+    //# Configure the routes
+    //##################################################
+    require("./app/routes/_routes.js")($app);
+    (async function () {
+        if (!$app.app.config.baseElmer) {
+            let oRegister = await $app.app.services.web.register();
+            console.log("# Auto-registered? " + $app.type.bool.mk($app.resolve(oRegister, "json.registered"), false));
+        }
+    })();
 
-//##################################################
-//# Configure the routes
-//##################################################
-require("./app/routes/_routes.js")($app);
-(async function () {
-    //# curl -X GET http://localhost:$portLocal/
-    if (!$app.app.config.baseElmer) {
-        let oRegister = await $app.app.services.web.register();
-        console.log("# Auto-registered? " + $app.type.bool.mk($app.resolve(oRegister, "json.registered"), false));
-    }
+    console.log("#");
+    console.log("# API Test: " + await $app.resolve($app.io.event.get("http://localhost:" + $app.app.config.port)).data);
     console.log("##############################");
-})();
+});

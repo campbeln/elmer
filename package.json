@@ -1,5 +1,5 @@
 {
-  "name": "baseapijwt",
+  "name": "elmer",
   "version": "1.0.0",
   "description": "Express API with JWT",
   "main": "index.js",

@@ -1,4 +1,4 @@
-# baseapijwt
+# elmer
 
 Setup:
 ========
@@ -29,4 +29,4 @@ node -e "console.log(require('crypto').randomBytes(128).toString('base64'));"
 
 License: MIT
 
-Copyright: (c) 2014-2021 Nicholas Campbell
+Copyright: (c) 2014-2023 Nicholas Campbell
