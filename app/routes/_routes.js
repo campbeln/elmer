@@ -56,7 +56,7 @@ module.exports = function ($app) {
 
     //# .register our $baseRouter then .requireDir of all the other /routes, processing each in turn
     $app.app.services.web.router.register($baseRouter, "");
-    $app.app.services.fs.requireDir("routes", ["_routes.js"], function (fnRequiredFile, oFS) {
+    $app.app.services.fs.requireDir("routes", ["_routes.js", "www.js"], function (fnRequiredFile, oFS) {
         let $fileRouter = $app.app.services.web.router();
 
         //# Pass in the above-created $fileRouter along with our $baseRouter to the fnRequiredFile, overriding with any returned value from it then .register it

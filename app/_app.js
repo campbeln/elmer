@@ -15,7 +15,7 @@ const $ip = require('ip');
 
 module.exports = async function ($app, $express, $httpServer) {
     $app.app = {
-        version: "0.2.2023-01-08",
+        version: "0.2.2023-02-02",
 
         data: {},
         config: {
