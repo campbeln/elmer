@@ -76,7 +76,7 @@ $httpServer.use($cookieParser());
 //# Setup the /static route
 //# curl -X GET http://localhost:3000/static/ from /app/www
 //# See: https://expressjs.com/en/starter/static-files.html
-$httpServer.use('/static', $express.static($path.join(__dirname, 'app', 'www')));
+$httpServer.use('/www', $express.static($path.join(__dirname, 'app', 'www')));
 
 //# Log each API request
 //$httpServer.use("/", require("./app/middleware/logapi.js")($app));
