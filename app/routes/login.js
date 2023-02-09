@@ -1,6 +1,7 @@
 'use strict';
 
 const $jwt = require('jsonwebtoken');
+const $bodyParser = require("body-parser");
 
 module.exports = function ($app) {
     let $router = $app.app.services.web.router();
@@ -89,6 +90,13 @@ module.exports = function ($app) {
 
         oResponse.status(bSuccess ? 200 : 401).json(oReturnVal);
     } //# login
+
+    //# Support json-encoded bodies
+    $app.app.services.web.server.use("/login", $bodyParser.json({
+        //type: "*/*",
+        //inflate: true,
+        limit: '50mb'
+    }));
 
 
     //# curl -X POST http://localhost:3000/login/verify/admin -H 'Content-Type: application/json' -d '{ "jwt":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNuIiwicm9sZSI6MCwiaWF0IjoxNjQwODQ3NzAwLCJleHAiOjE2NDA4NTEzMDB9.pGwQnctoytxpozWJPVlibkwCv1YauWhckKY7HFuHpC4" }'
