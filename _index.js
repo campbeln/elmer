@@ -57,7 +57,8 @@ $httpServer.use($compression({
     threshold: 0
 }));
 
-//#
+//# If this is not .baseElmer, enable .json and .urlencoded $bodyParser
+//#     NOTE: As the $bodyParser consumes the posted body, we must exclude any proxied routes
 //#     SEE: https://stackoverflow.com/questions/28371641/how-can-i-use-express-http-proxy-after-bodyparser-json-has-been-called
 if (!$app.app.config.baseElmer) {
     //# Support json-encoded bodies
