@@ -6,6 +6,8 @@
 ##################################################
 # Version: 2023-02-08
 
+NEWLINE=$'\n'
+
 # Loop through arguments and process them
 #     See: https://pretzelhands.com/posts/command-line-flags/ also https://www.baeldung.com/linux/use-command-line-arguments-in-bash-script
 for arg in "$@"
@@ -61,7 +63,6 @@ do
         ;;
     esac
 done
-NEWLINE=$'\n'
 
 #
 vars=""
