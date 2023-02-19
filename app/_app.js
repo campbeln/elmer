@@ -54,7 +54,10 @@ module.exports = async function ($app, $express, $httpServer) {
                     $form.multiples = oOptions.multiples;
                     $form.uploadDir = oOptions.uploadDir;
 
-                    //#
+                    //# Since $form.on('end'); is called more than once on occasion, wrap the passed fnOnComplete to ensure it's only called .once
+                    fnOnComplete = $app.type.fn.once(fnOnComplete);
+
+                    //# Setup the event listeners then .parse the oRequest
                     $form.on('field', function(sField, sValue) {
                         //# If the sField already exists within oFormData.fields, make sure it's an .arr and .push in the additional sValue
                         if ($app.type.obj.has(oFormData.fields, sField)) {
@@ -89,7 +92,6 @@ module.exports = async function ($app, $express, $httpServer) {
                     });
                     $form.on('end', function() {
                         $app.type.fn.run(fnOnComplete, { args: [oFormData] });
-                        //fnOnComplete(oFormData);
                     });
                     $form.parse(oRequest);
                 },

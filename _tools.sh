@@ -15,10 +15,15 @@ do
         flagPort="${arg#*=}"
         shift # Remove --port= from processing
         ;;
+        -e=*|--env=*)
+        flagEnv="${arg#*=}"
+        shift # Remove --env= from processing
+        ;;
         -a|--all)
         flagSync=1
         flagRebuild=1
         flagLogs=1
+        flagVars=1
         shift # Remove --rebuild from processing
         ;;
         -s|--sync)
@@ -31,6 +36,10 @@ do
         ;;
         -l|--logs)
         flagLogs=1
+        shift # Remove --logs from processing
+        ;;
+        -v|--vars)
+        flagVars=1
         shift # Remove --logs from processing
         ;;
         -n|--network)
@@ -52,28 +61,66 @@ do
         ;;
     esac
 done
-
+NEWLINE=$'\n'
 
 #
+vars=""
 for keyval in  $(grep -E '": [^\{]' ./app/config/base.json | sed -e 's/: /=/' -e "s/\(\,\)$//"); do
-    echo 'export ' $keyval && eval export $keyval
+    # echo export $keyval
+    eval export $keyval
     echo $keyval | sed 's/"//g' >> ./docker.env
+
+    vars+="${keyval}${NEWLINE}"
 done;
+
+
+echo "########################################"
+echo "# ${name}"
+echo "########################################"
+
+# Environment
+if [ "$flagEnv" = "dev" ] || [ "$flagEnv" = "prod" ]; # [ "$flagEnv" = "dev" -o "$flagEnv" = "prod" ];
+then
+    echo "# Environment: ${flagEnv}"
+
+    for keyval in  $(grep -E '": [^\{]' ./app/config/${flagEnv}.json | sed -e 's/: /=/' -e "s/\(\,\)$//"); do
+        # echo export $keyval
+        eval export $keyval
+        echo $keyval | sed 's/"//g' >> ./docker.env
+
+        vars+="${keyval}${NEWLINE}"
+    done;
+else
+    # echo "# Invalid Env: ${flagEnv}"
+    noop
+fi
+
+
+# Vars
+if [[ $flagVars == 1 ]];
+then
+    echo "####################"
+    echo "# Vars"
+    echo "####################"
+    echo "${vars}"
+fi
 
 
 # Sync
 if [[ $flagSync == 1 ]];
 then
+    echo "####################"
+    echo "# Syncing..."
+    echo "####################"
+
     cp ../elmer/app/routes/_routes.js ./app/routes/
     cp ../elmer/app/_app.js ./app/
     cp ../elmer/_index.js .
     cp ../elmer/_tools.sh .
-    rm _rebuilddocker.sh
-    rm _syncElmerBase.sh
-    rm _logs.sh
     cp -R ../elmer/libs/ish ./libs/
 
-    npm update
+    # npm update
+    npm update --save/--save-dev # https://jh3y.medium.com/how-to-update-all-npm-packages-in-your-project-at-once-17a8981860ea
     npm install
     npm audit fix --force
 fi
@@ -82,7 +129,11 @@ fi
 # Rebuild
 if [[ $flagRebuild == 1 ]];
 then
-    docker network create api
+    echo "####################"
+    echo "# Rebuilding..."
+    echo "####################"
+
+    docker network create api #  2>&1 >/dev/null   # https://stackoverflow.com/a/962268/235704
     docker ps -a | grep $dockerBaseName/$name | awk '{ system("docker container stop " $1) }'
     docker build . -t $dockerBaseName/$name
     if [[ $baseElmer == "true" ]];
@@ -92,21 +143,19 @@ then
         docker run --dns $dns1 --dns $dns2 --net=$net --hostname $name.$hostname -p $portLocal:$port -d $dockerBaseName/$name
     fi
 
-    # sleep 3
-    # curl -X GET http://localhost:$portLocal/
-
-    echo "####################"
-    echo "# Container Start:"
-    echo "####################"
-
     # Force the $flagLogs below
     flagLogs=1
+    sleep 2
 fi
 
 
 # Log
 if [[ $flagLogs == 1 ]];
 then
+    echo "####################"
+    echo "# Logs"
+    echo "####################"
+
     docker ps -a | grep $dockerBaseName/$name | awk '{ system("docker container logs " $1) }'
 fi
 
@@ -114,6 +163,10 @@ fi
 # Network
 if [[ $flagNetwork == 1 ]];
 then
+    echo "####################"
+    echo "# Docker Network"
+    echo "####################"
+
     docker network inspect api
 fi
 
