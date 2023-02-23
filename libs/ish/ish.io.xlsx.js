@@ -70,7 +70,7 @@
                 ;
 
                 //try {
-                    console.log(core.type.str.is(vFile), core.type.obj.is(vFile), core.type.is(vFile, ArrayBuffer));
+                    //console.log(core.type.str.is(vFile), core.type.obj.is(vFile), core.type.is(vFile, ArrayBuffer));
 
                     //# If the passed vFile .is .str, .readFile as a path
                     if (core.type.str.is(vFile)) {
@@ -87,9 +87,7 @@
                         //# Else use it's .file and .options to .read it into our oWorkbook
                         //#     NOTE: type.obj.has is not used here in order to avoid requiring ish.type-ex.js
                         else if (vFile.file) {
-                            console.log(111);
                             oWorkbook = XLSX.read(vFile.file, core.extend({ type: "binary" }, vFile.options));
-                            console.log(112);
                         }
                     }
 
