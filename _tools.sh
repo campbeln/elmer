@@ -93,7 +93,7 @@ then
     done;
 else
     # echo "# Invalid Env: ${flagEnv}"
-    noop
+    :
 fi
 
 
@@ -134,7 +134,7 @@ then
     echo "# Rebuilding..."
     echo "####################"
 
-    docker network create api #  2>&1 >/dev/null   # https://stackoverflow.com/a/962268/235704
+    docker network inspect api >/dev/null 2>&1 || docker network create api   # https://stackoverflow.com/a/53052379
     docker ps -a | grep $dockerBaseName/$name | awk '{ system("docker container stop " $1) }'
     docker build . -t $dockerBaseName/$name
     if [[ $baseElmer == "true" ]];
