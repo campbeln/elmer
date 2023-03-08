@@ -3,7 +3,7 @@ const $expressProxy = require('express-http-proxy');
 //#
 module.exports = function ($app) {
     'use strict';
-    $app.app.versionEx = "0.1.2023-01-08";
+    $app.app.versionEx = "0.1.2023-03-07";
 
     //#
     $app.extend($app.app, {
@@ -17,39 +17,6 @@ module.exports = function ($app) {
         },
         services: {
             web: {
-                //bodyParser: $bodyParser,
-                proxy: function (sProxyURL, sRemovePrefixFromPath) {
-                    /*
-                    let bRemovePrefix;
-
-                    //#
-                    sProxyURL = $app.type.str.mk(sProxyURL);
-                    sRemovePrefixFromPath = $app.type.str.mk(sRemovePrefixFromPath);
-                    bRemovePrefix = (sRemovePrefixFromPath !== "");
-
-                    //#
-                    if (bRemovePrefix) {
-                        sRemovePrefixFromPath = (sRemovePrefixFromPath[0] === "/" ? "" : "/") + sRemovePrefixFromPath;
-                    }
-
-                    //#
-                    //# https://stackoverflow.com/questions/18432779/piping-remote-file-in-expressjs/66991063#66991063
-                    return function (oRequest, oResponse) {
-                        let sURL = "http://" + sProxyURL + oRequest.url;
-                        sURL = (bRemovePrefix ? sURL.replace(sRemovePrefixFromPath, "") : sURL);
-
-                        try {
-                            $fetch(sURL).then((oActual) => {
-                                oActual.headers.forEach((sValue, sName) => oResponse.setHeader(sName, sValue));
-                                oActual.body.pipe(oResponse);
-                            });
-                        } catch (e) {
-                            console.log(e);
-                        }
-                    };
-                    */
-                },
-
                 //# Overload the existing $app.app.services.web.router with our baseElmer version
                 router: (function() {
                     let a_oRegisteredRoutes = [],

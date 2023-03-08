@@ -46,7 +46,7 @@ module.exports = function($app, $router /*, $baseRouter */) {
         if (bSuccess) {
             //#
             oRoute = $app.extend(oRoute, $app.app.services.web.router.register(oRoute.ip + ":" + oRoute.port, sRouteName, $app.type.bool.mk(oQuerystring.secure, true)));
-            console.log(oRoute.ip, ":" + oRoute.port, sRouteName);
+            //console.log(oRoute.ip, ":" + oRoute.port, sRouteName);
         }
 
         oResponse.status(bSuccess ? $app.io.net.status.success.ok : $app.io.net.status.clientError.conflict).json(oRoute);

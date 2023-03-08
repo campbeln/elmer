@@ -5,11 +5,13 @@
     "portLocal": 45000,
     "secure": false,
     "forceRegistration": true,
+    "dependencies": [],
 
     "net": "api",
     "hostname": "dev",
     "dockerBaseName": "elmer",
     "port": 3001,
+    "uploadLimitMb": 500,
     "dns1": "1.1.1.1",
     "dns2": "1.0.0.1"
 }

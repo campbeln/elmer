@@ -64,7 +64,7 @@ do
     esac
 done
 
-#
+# Import the base JSON variables into this script via export and into docker.env
 vars=""
 for keyval in  $(grep -E '": [^\{]' ./app/config/base.json | sed -e 's/: /=/' -e "s/\(\,\)$//"); do
     # echo export $keyval
@@ -84,6 +84,7 @@ if [ "$flagEnv" = "dev" ] || [ "$flagEnv" = "prod" ]; # [ "$flagEnv" = "dev" -o 
 then
     echo "# Environment: ${flagEnv}"
 
+    # Import the $flagEnv JSON variables into this script via export and into docker.env
     for keyval in  $(grep -E '": [^\{]' ./app/config/${flagEnv}.json | sed -e 's/: /=/' -e "s/\(\,\)$//"); do
         # echo export $keyval
         eval export $keyval
@@ -134,9 +135,12 @@ then
     echo "# Rebuilding..."
     echo "####################"
 
+    # Docker
     docker network inspect api >/dev/null 2>&1 || docker network create api   # https://stackoverflow.com/a/53052379
     docker ps -a | grep $dockerBaseName/$name | awk '{ system("docker container stop " $1) }'
     docker build . -t $dockerBaseName/$name
+
+    # Don't include dns definitions for $baseElmer
     if [[ $baseElmer == "true" ]];
     then
         docker run --net=$net --hostname $name.$hostname -p $portLocal:$port -d $dockerBaseName/$name
@@ -144,7 +148,7 @@ then
         docker run --dns $dns1 --dns $dns2 --net=$net --hostname $name.$hostname -p $portLocal:$port -d $dockerBaseName/$name
     fi
 
-    # Force the $flagLogs below
+    # Force the $flagLogs below and sleep to allow the logs to register
     flagLogs=1
     sleep 2
 fi
