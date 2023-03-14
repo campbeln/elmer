@@ -9,8 +9,12 @@ WORKDIR /usr/src/app
 COPY package*.json
 
 # Ensure NPM CErtificates are reconized via the provided PEM file (if any)
-#COPY cert.pem ./
-#RUN npm config set cafile ./cert.pem
+# COPY cert.pem ./
+# RUN npm config set cafile ./cert.pem
+# RUN npm config set strict-ssl=false                       # https://stackoverflow.com/questions/45884752/npm-err-code-unable-to-get-issuer-cert-locally
+# RUN npm config set registry http://registry.npmjs.org/ 
+# RUN export NODE_EXTRA_CA_CERTS="/usr/src/app/cert.pem"
+# RUN set NODE_TLS_REJECT_UNAUTHORIZED=0
 
 # Install NPM packages
 RUN npm Install
