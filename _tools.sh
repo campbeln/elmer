@@ -115,7 +115,7 @@ then
 
         if [ "$flagSetupEnv" = "base" ];
         then
-            rm -R ./app/childapi/
+            rm -R ./app/childapi
         fi
 
         if [ "$flagSetupEnv" = "child" ];
@@ -124,6 +124,8 @@ then
             rm ./app/routes/elmer.js
             rm ./app/routes/login.js
             rm ./app/app-ex.js
+            rm ./app/config/base.json
+
             mv ./app/childapi/app-ex.js ./app/app-ex.js
             mv ./app/childapi/config/base.js ./app/config/base.json
             mv ./app/childapi/routes/example.js ./app/routes/example.js
