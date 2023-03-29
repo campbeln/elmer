@@ -103,7 +103,7 @@ $httpServer.listen($app.app.config.port, "0.0.0.0", async () => {
             appEx: $app.app.versionEx
         }
     };
-    
+
     //##################################################
     //# Configure the routes
     //##################################################
@@ -114,11 +114,7 @@ $httpServer.listen($app.app.config.port, "0.0.0.0", async () => {
             //# Setup the .api object (including .register'ing if configured to do so)
             $app.app.status.api = {
                 heartbeat: ($app.resolve(await $app.app.services.web.apiUp($app.app.config.name), "ok") === true),
-                registered: (
-                    $app.app.config.forceRegistration ?
-                    $app.type.bool.mk($app.resolve(await $app.app.services.web.register(), "json.registered"), false) :
-                    false
-                ),
+                registered: $app.type.bool.mk($app.resolve(await $app.app.services.web.register(), "json.registered"), false),
                 dependencies: (
                     $app.type.arr.is($app.app.config.dependencies, true) ?
                     $app.resolve(await $app.app.services.web.apiUp($app.app.config.dependencies), "ok") === true :

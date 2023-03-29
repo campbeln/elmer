@@ -5,7 +5,7 @@ API Microservices Architecture utilizing a facade that manages security and rout
 ## Setup
 Install Docker Desktop or Rancher Desktop, configure per standard configuration (including adding commands to your system's `PATH`) then startup your Docker server.
 
-Run the following commands first for your Elmer Facade then for each of your Child API's:
+Run the following commands first for your `Elmer Facade` then for each of your `Child API`s:
 ```sh
 chmod 755 _tools.sh
 ./_tools.sh --update
