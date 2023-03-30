@@ -56,9 +56,9 @@ do
         flagTest=1
         shift # Remove --test from processing
         ;;
-        --setup=*)
-        flagSetupEnv="${arg#*=}"
-        shift # Remove --setup from processing
+        --config=*)
+        flagConfigEnv="${arg#*=}"
+        shift # Remove --config from processing
         ;;
         #-x|--xxx)
         #flagXXX="$2"
@@ -107,18 +107,18 @@ fi
 
 
 # Setup
-if [ "$flagSetupEnv" = "base" ] || [ "$flagSetupEnv" = "child" ]; # [ "$flagSetupEnv" = "base" -o "$flagSetupEnv" = "child" ];
+if [ "$flagConfigEnv" = "base" ] || [ "$flagConfigEnv" = "child" ]; # [ "$flagConfigEnv" = "base" -o "$flagConfigEnv" = "child" ];
 then
     if [ -d "./app/childapi" ];
     then
-        echo "# Configuring Version: ${flagSetupEnv}"
+        echo "# Configuring Version: ${flagConfigEnv}"
 
-        if [ "$flagSetupEnv" = "base" ];
+        if [ "$flagConfigEnv" = "base" ];
         then
             rm -R ./app/childapi
         fi
 
-        if [ "$flagSetupEnv" = "child" ];
+        if [ "$flagConfigEnv" = "child" ];
         then
             rm -R ./app/middleware
             rm ./app/routes/elmer.js
@@ -135,7 +135,7 @@ then
         echo "# Configuring Version: ERROR - This directory has already been configured!"
     fi
 else
-    # echo "# Invalid Env: ${flagSetupEnv}"
+    # echo "# Invalid Env: ${flagConfigEnv}"
     :
 fi
 
