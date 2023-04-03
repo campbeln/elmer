@@ -171,12 +171,12 @@ console.log("error!!", err);
 
                                         //# If this is a bSecure route, determine the .mode and .use the appropriate middleware
                                         if (bSecure) {
-                                            switch(oElmerConfig.security.mode.toLowercase()) {
+                                            switch(oElmerConfig.security.mode.toLowerCase()) {
                                                 case "basic": {
-                                                    $httpServer.use("/" + sRoute, require(__dirname + "/app/middleware/basicauth.js")($app));
+                                                    $httpServer.use("/" + sRoute, require(__dirname + "/middleware/basicauth.js")($app));
                                                 }
                                                 case "jwt": {
-                                                    $httpServer.use("/" + sRoute, require(__dirname + "/app/middleware/jwt.js")($app));
+                                                    $httpServer.use("/" + sRoute, require(__dirname + "/middleware/jwt.js")($app));
                                                 }
                                             }
                                         }
