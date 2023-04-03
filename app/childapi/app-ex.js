@@ -1,7 +1,9 @@
-//#
+'use strict';
+
+
+//# Set the .exports to the Elmer app-ex function definition
 module.exports = function ($app) {
-    'use strict';
-    $app.app.versionEx = "0.1.2022-12-03";
+    $app.app.versionEx = "0.1.2023-04-01";
 
 
 }; //# module.exports
