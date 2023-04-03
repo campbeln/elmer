@@ -7,6 +7,29 @@
     "forceRegistration": true,
     "dependencies": [],
 
+    "security": {
+        "basic": {
+            "mode": "basic",
+            "realm": "api",
+            "users": [
+                { "u": "user1", "p": "pass1", "meta": "data" },
+                { "u": "user2", "p": "pass2", "meta": "data0" }
+            ]
+        },
+        "jwt": {
+            "mode": "jwt",
+            "admin": [
+                { "u": "cn", "p": "secret", "meta": "data1" }
+            ],
+            "internal": [
+                { "u": "cb", "p": "nonsecret", "meta": "data2" }
+            ],
+            "external": [
+                { "u": "ac", "p": "unsecret", "meta": "data3" }
+            ]
+        }
+    },
+
     "net": "api",
     "hostname": "dev",
     "dockerBaseName": "elmer",
