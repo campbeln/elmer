@@ -25,7 +25,8 @@ module.exports = function ($app) {
                 //# Else sAuth wasn't the .localSecret, so return Unauthorized (401) and an .error
                 else {
                     return oResponse.status(401).json({
-                        error: 'Invalid authorization.'
+                        method: "JWT",
+                        error: 'Authentication required.'
                     });
                 }
             }
@@ -38,7 +39,8 @@ module.exports = function ($app) {
                 catch (e) {
                     //# .verify failed, so return Unauthorized (401) and an .error
                     return oResponse.status(401).json({
-                        error: 'Invalid authorization.'
+                        method: "JWT",
+                        error: 'Authentication required.'
                     });
                 }
             }
@@ -46,6 +48,7 @@ module.exports = function ($app) {
         //# Else the .authorization .headers is missing, so return Unauthorized (401) and an .error
         else {
             return oResponse.status(401).json({
+                method: "JWT",
                 error: 'Authorization cannot be empty.'
             });
         }

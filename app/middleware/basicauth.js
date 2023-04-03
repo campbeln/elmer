@@ -57,7 +57,10 @@ module.exports = function ($app) {
                 //# Else a valid .username/.password combo was not found, so access is denied
                 else {
                     oResponse.set('WWW-Authenticate', 'Basic realm="' + oConfig.realm + '"');
-                    oResponse.status(401).send('Authentication required.');
+                    oResponse.status(401).json({
+                        method: "BasicAuth",
+                        error: 'Authentication required.'
+                    });
                 }
             },
             Math.floor((process.uptime() % 1) * 100)
