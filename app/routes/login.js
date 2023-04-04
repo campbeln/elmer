@@ -22,6 +22,9 @@ module.exports = function ($elmer, $router /*, $baseRouter */) {
         }));
     }
 
+    //#
+    require(__dirname + "/../middleware/_jwt.js")($elmer, null);
+
 
     //# curl -X POST http://localhost:45000/login/admin -H 'Content-Type: application/json' -d '{ "username":"cn", "password":"secret" }'
     $router.post("/admin", async (oRequest, oResponse) => {
