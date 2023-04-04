@@ -68,8 +68,8 @@ module.exports = function ($app) {
                         {
                             registered: fnOrigRegistered,
 
-                            register: function(vRouterOrURL, sRoute, bSecure) {
-                                let $router, oRoute, sProxyURL, bRemovePrefix,
+                            register: function(vRouterOrURL, sRoute, oSecurity) {
+                                let $router, oRoute, sProxyURL, bRemovePrefix, bSecure,
                                     sRemovePrefixFromPath = $app.type.str.mk(sRoute),
                                     $httpServer = $app.app.services.web.server,
                                     bRouteExists = false
@@ -88,8 +88,14 @@ module.exports = function ($app) {
                                     sRemovePrefixFromPath = (sRemovePrefixFromPath[0] === "/" ? "" : "/") + sRemovePrefixFromPath;
                                 }
 
-                                //#
-                                bSecure = $app.type.bool.mk(bSecure, false);
+                                //# If a $router was passed with a .elmer.security object, .extend oSecurity over it, else just keep oSecurity as passed
+                                oSecurity = ($app.type.obj.is($app.resolve($router, "elmer.security")) ?
+                                    $app.extend($router.elmer.security, oSecurity) :
+                                    oSecurity
+                                );
+
+                                //# Set bSecure based on if we have a oSecurity .obj
+                                bSecure = $app.type.obj.is(oSecurity);
 
                                 //#
                                 if ($app.type.str.is(sRoute)) {
@@ -99,28 +105,34 @@ module.exports = function ($app) {
                                     //#
                                     if (!bRouteExists) {
                                         //#
-                                        //# TODO
-                                        /*
-                                            switch(oElmerConfig.security.mode.toLowerCase()) {
+                                        if (bSecure) {
+                                            //#
+                                            switch($app.type.str.mk(oSecurity.mode).trim().toLowerCase()) {
                                                 case "basic": {
-                                                    $httpServer.use("/" + sRoute, require(__dirname + "/middleware/_basicauth.js")($app));
+                                                    $httpServer.use(
+                                                        "/" + sRoute,
+                                                        require(__dirname + "/middleware/_basicauth.js")($app, oSecurity)
+                                                    );
                                                     break;
                                                 }
                                                 case "jwt": {
-                                                    $httpServer.use("/" + sRoute, require(__dirname + "/middleware/_jwt.js")($app));
+                                                    $httpServer.use(
+                                                        "/" + sRoute,
+                                                        require(__dirname + "/middleware/_jwt.js")($app, oSecurity)
+                                                    );
                                                     break;
                                                 }
                                             }
-                                        */
-                                        if (bSecure) {
-                                            $httpServer.use("/" + sRoute, require(__dirname + "/app/middleware/_basicauth.js")($app));
                                         }
 
                                         //#
                                         //# https://stackoverflow.com/questions/49017240/express-js-proxy-to-call-web-api
                                         if ($app.type.str.mk(sProxyURL)) {
                                             let sURL = "http://" + sProxyURL; // + oRequest.url
-                                            sURL = (bRemovePrefix ? sURL.replace(sRemovePrefixFromPath, "") : sURL);
+                                            sURL = (bRemovePrefix ?
+                                                sURL.replace(sRemovePrefixFromPath, "") :
+                                                sURL
+                                            );
                                             $router = $expressProxy(sURL, {
                                                 parseReqBody: false
                                             });

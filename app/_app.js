@@ -147,16 +147,20 @@ console.log("error!!", err);
                             return $express.Router();
                         }, //# services.web.router
                         {
-                            register: function($router, sRoute) {
+                            register: function($router, sRoute, oSecurity) {
                                 let oRoute, bSecure,
                                     bRouteExists = false,
-                                    oElmerConfig = $app.extend({
-                                        security: {
-                                            //usernames: [""],
-                                            //passwords: [""],
-                                            mode: ""
+                                    oElmerConfig = $app.extend(
+                                        {
+                                            security: {
+                                                mode: ""
+                                            }
+                                        },
+                                        $router.elmer,
+                                        {
+                                            security: oSecurity
                                         }
-                                    }, $router.elmer)
+                                    )
                                 ;
 
                                 //# If the sRoute is valid, setup the local oRoute and determine if the bRouteExists
@@ -171,13 +175,19 @@ console.log("error!!", err);
 
                                         //# If this is a bSecure route, determine the .mode and .use the appropriate middleware
                                         if (bSecure) {
-                                            switch(oElmerConfig.security.mode.toLowerCase()) {
+                                            switch(oElmerConfig.security.mode.trim().toLowerCase()) {
                                                 case "basic": {
-                                                    $httpServer.use("/" + sRoute, require(__dirname + "/middleware/_basicauth.js")($app));
+                                                    $httpServer.use(
+                                                        "/" + sRoute,
+                                                        require(__dirname + "/middleware/_basicauth.js")($app, oElmerConfig.security)
+                                                    );
                                                     break;
                                                 }
                                                 case "jwt": {
-                                                    $httpServer.use("/" + sRoute, require(__dirname + "/middleware/_jwt.js")($app));
+                                                    $httpServer.use(
+                                                        "/" + sRoute,
+                                                        require(__dirname + "/middleware/_jwt.js")($app, oElmerConfig.security)
+                                                    );
                                                     break;
                                                 }
                                             }
