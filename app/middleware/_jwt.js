@@ -9,9 +9,9 @@
 
 var $jwt = require('jsonwebtoken');
 
-module.exports = function ($app, oConfig) {
-    //#
-    oConfig = $app.extend(
+module.exports = function ($elmer, oSecurityConfig) {
+    //# Process the passed oSecurityConfig into an object with any default values applied
+    oSecurityConfig = $elmer.extend(
         {                           //# Expected shape of the JWT config
             //mode: "jwt",              //# Inferred
             salt: {
@@ -27,20 +27,114 @@ module.exports = function ($app, oConfig) {
             internal: [],
             external: []
         },
-        $app.resolve($app.app.config, "security.jwt"),
-        oConfig
+        $elmer.resolve($elmer.app.config, "security.jwt"),
+        oSecurityConfig //$elmer.resolve($router, "elmer.security")
     );
 
+    //#
+    $elmer.app.services.security.jwt = {
+        defaultError: function () {
+            return {
+                error: 'Incorrect username/password combination.'
+            };
+        },
+
+        verify: function (oJWT) {
+            return $jwt.verify(oJWT, $elmer.app.config.security.jwt.salt.jwtSecret)
+        },
+
+        login: async function login(oRequest, oResponse, eMode) {
+            let oJWTConfig, oUser, i,
+                oBody = $elmer.type.obj.mk(oRequest.body, null),
+                oReturnVal = $elmer.app.services.security.jwt.defaultError()
+            ;
+
+            //# In order to avoid crypto timing attacks, use the decimal part of process.uptime to randomly and slightly delay processing of the oBody
+            //#     NOTE: This is arguably security through obscurity, but as it's based on process.uptime its random by definition.
+            setTimeout(
+                function () {
+                    //# Determine the eMode, setting the oJWTConfig accordingly
+                    switch (eMode) {
+                        case $elmer.app.enums.userTypes.admin: {
+                            oJWTConfig = {
+                                salt: oSecurityConfig.salt.public.admin,
+                                users: oSecurityConfig.admin,
+                                expiresIn: "1 hours"
+                            };
+                            break;
+                        }
+                        case $elmer.app.enums.userTypes.internal: {
+                            oJWTConfig = {
+                                salt: oSecurityConfig.salt.public.internal,
+                                users: oSecurityConfig.internal,
+                                expiresIn: "8 hours"
+                            };
+                            break;
+                        }
+                        case $elmer.app.enums.userTypes.external: {
+                            oJWTConfig = {
+                                salt: oSecurityConfig.salt.public.external,
+                                users: oSecurityConfig.external,
+                                expiresIn: "8 hours"
+                            };
+                            break;
+                        }
+                    }
+
+                    //# If we have a posted .body, a valid oJWTConfig and a valid .jwtSecret
+                    if (oBody && oJWTConfig && $elmer.type.arr.is(oJWTConfig.users, true) && $elmer.type.str.is(oSecurityConfig.salt.jwtSecret, true)) {
+                        //# Verify the username/password
+                        for (i = 0; i < oJWTConfig.users.length; i++) {
+                            //# If the current .u(sername) and .p(assword) match, set our oUser and fall from the loop
+                            if ($elmer.type.obj.is(oJWTConfig.users[i]) &&
+                                oBody.username === oJWTConfig.users[i].u &&
+                                oBody.password === oJWTConfig.users[i].p
+                            ) {
+                                oUser = $elmer.extend({}, oJWTConfig.users[i]);
+                                break;
+                            }
+                        }
+
+                        //# If the username/password was correct, reset our oReturnVal to the oUser
+                        if (oUser) {
+                            oReturnVal = $elmer.extend(
+                                oUser,
+                                { p: undefined },
+                                {
+                                    jwt: $jwt.sign(
+                                        {
+                                            username: oUser.u,
+                                            role: eMode
+                                        },
+                                        oSecurityConfig.salt.jwtSecret,
+                                        {
+                                            expiresIn: oJWTConfig.expiresIn
+                                        }
+                                    )
+                                }
+                            );
+                        }
+                    }
+
+                    oResponse.status(oUser ? 200 : 401).json(oReturnVal);
+                },
+                Math.floor((process.uptime() % 1) * 100)
+            );
+        } //# login
+    };
+
+
+    //#
     return function (oRequest, oResponse, fnContinue) {
-        let sAuth = $app.resolve(oRequest, "headers.authorization") || $app.resolve(oRequest, "cookies.auth"),
-            bIsLocalRequest = false //$app.type.str.cmp($app.resolve(oRequest, "headers.origin"), ["127.0.0.1", "localhost"])
+        let sAuth = $elmer.resolve(oRequest, "headers.authorization") || $elmer.resolve(oRequest, "cookies.auth"),
+            bIsLocalRequest = false //$elmer.type.str.cmp($elmer.resolve(oRequest, "headers.origin"), ["127.0.0.1", "localhost"])
         ;
 
         //# If an .authorization .headers is present
-        if ($app.type.str.is(sAuth, true)) {
+        if ($elmer.type.str.is(sAuth, true)) {
             //# If this bIsLocalRequest, ensure the sAuth is valid
             if (bIsLocalRequest) {
-                if (sAuth === oConfig.localSecret) {
+                if (sAuth === oSecurityConfig.localSecret) {
                     oRequest.user = { local: true };
                 }
                 //# Else sAuth wasn't the .localSecret, so return Unauthorized (401) and an .error
@@ -55,7 +149,7 @@ module.exports = function ($app, oConfig) {
             else {
                 try {
                     //# .verify the JWT token, setting it into oRequest.user
-                    oRequest.user = $jwt.verify(sAuth, oConfig.jwtSecret);
+                    oRequest.user = $jwt.verify(sAuth, oSecurityConfig.jwtSecret);
                 }
                 catch (e) {
                     //# .verify failed, so return Unauthorized (401) and an .error
