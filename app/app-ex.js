@@ -99,8 +99,21 @@ module.exports = function ($app) {
                                     //#
                                     if (!bRouteExists) {
                                         //#
+                                        //# TODO
+                                        /*
+                                            switch(oElmerConfig.security.mode.toLowerCase()) {
+                                                case "basic": {
+                                                    $httpServer.use("/" + sRoute, require(__dirname + "/middleware/_basicauth.js")($app));
+                                                    break;
+                                                }
+                                                case "jwt": {
+                                                    $httpServer.use("/" + sRoute, require(__dirname + "/middleware/_jwt.js")($app));
+                                                    break;
+                                                }
+                                            }
+                                        */
                                         if (bSecure) {
-                                            $httpServer.use("/" + sRoute, require(__dirname + "/app/middleware/auth.js")($app));
+                                            $httpServer.use("/" + sRoute, require(__dirname + "/app/middleware/_basicauth.js")($app));
                                         }
 
                                         //#
@@ -112,7 +125,7 @@ module.exports = function ($app) {
                                                 parseReqBody: false
                                             });
                                         }
-                                        $httpServer.use("/" + sRoute, require(__dirname + "/middleware/cache.js")($app, sRoute));
+                                        $httpServer.use("/" + sRoute, require(__dirname + "/middleware/_cache.js")($app, sRoute));
                                         $httpServer.use("/" + sRoute, $router);
 
                                         //#

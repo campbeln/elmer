@@ -157,11 +157,12 @@ then
     echo "# Syncing..."
     echo "####################"
 
+    cp -R ../elmer/app/middleware/* ./app/middleware/
     cp ../elmer/app/routes/_routes.js ./app/routes/
     cp ../elmer/app/_app.js ./app/
+    cp -R ../elmer/libs/* ./libs/
     cp ../elmer/_index.js .
     cp ../elmer/_tools.sh .
-    cp -R ../elmer/libs/ish ./libs/
 
     flagUpdate=1
 fi

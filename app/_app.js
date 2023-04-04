@@ -173,11 +173,11 @@ console.log("error!!", err);
                                         if (bSecure) {
                                             switch(oElmerConfig.security.mode.toLowerCase()) {
                                                 case "basic": {
-                                                    $httpServer.use("/" + sRoute, require(__dirname + "/middleware/basicauth.js")($app));
+                                                    $httpServer.use("/" + sRoute, require(__dirname + "/middleware/_basicauth.js")($app));
                                                     break;
                                                 }
                                                 case "jwt": {
-                                                    $httpServer.use("/" + sRoute, require(__dirname + "/middleware/jwt.js")($app));
+                                                    $httpServer.use("/" + sRoute, require(__dirname + "/middleware/_jwt.js")($app));
                                                     break;
                                                 }
                                             }

@@ -27,7 +27,6 @@ An Elmer `Child API` represents a microservice defining an API exposed under the
 
 You can run `./_tools.sh --setup=child` or run the following code:
 ```sh
-rm -R ./app/middleware
 rm ./app/routes/elmer.js
 rm ./app/routes/login.js
 rm ./app/app-ex.js
