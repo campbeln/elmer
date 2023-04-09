@@ -147,21 +147,14 @@ console.log("error!!", err);
                             return $express.Router();
                         }, //# services.web.router
                         {
-                            register: function($router, sRoute, oSecurity) {
+                            register: function(sRoute, $router, oConfig) {
                                 let oRoute, bSecure,
                                     bRouteExists = false,
-                                    oElmerConfig = $elmer.extend(
-                                        {
-                                            security: {
-                                                mode: ""
-                                            }
-                                        },
-                                        $router.elmer,
-                                        {
-                                            security: oSecurity
-                                        }
-                                    )
+                                    oElmerConfig = $elmer.extend($router.elmer, oConfig)
                                 ;
+
+                                //# .extend and $router passed .elmer oConfig object with any passed oConfig (which implicitly returns an object)
+                                oConfig = $elmer.extend($router.elmer, oConfig);
 
                                 //# If the sRoute is valid, setup the local oRoute and determine if the bRouteExists
                                 if ($elmer.type.str.is(sRoute)) {
@@ -198,7 +191,7 @@ console.log("error!!", err);
                                         oRoute = {
                                             route: sRoute,
                                             secure: bSecure,
-                                            security: (bSecure ? oElmerConfig.secure : ""),
+                                            config: oElmerConfig,
                                             router: $router
                                         };
                                         a_oRegisteredRoutes.push(oRoute);

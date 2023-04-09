@@ -68,18 +68,24 @@ module.exports = function ($elmer) {
                         {
                             registered: fnOrigRegistered,
 
-                            register: function(vRouterOrURL, sRoute, oSecurity) {
+                            register: function(sRoute, vRouterOrURL, oConfig) {
                                 let $router, oRoute, sProxyURL, bRemovePrefix, bSecure,
                                     sRemovePrefixFromPath = $elmer.type.str.mk(sRoute),
                                     $httpServer = $elmer.app.services.web.server,
                                     bRouteExists = false
                                 ;
 
+                                //#
                                 if ($elmer.type.str.is(vRouterOrURL)) {
                                     sProxyURL = $elmer.type.str.mk(vRouterOrURL);
+                                    oConfig = $elmer.type.obj.mk(oConfig);
                                 }
+                                //#
                                 else {
                                     $router = vRouterOrURL;
+
+                                    //# .extend and $router passed .elmer oConfig object with any passed oConfig (which implicitly returns an object)
+                                    oConfig = $elmer.extend($router.elmer, oConfig);
                                 }
                                 bRemovePrefix = (sRemovePrefixFromPath !== "");
 
@@ -88,14 +94,8 @@ module.exports = function ($elmer) {
                                     sRemovePrefixFromPath = (sRemovePrefixFromPath[0] === "/" ? "" : "/") + sRemovePrefixFromPath;
                                 }
 
-                                //# If a $router was passed with a .elmer.security object, .extend oSecurity over it, else just keep oSecurity as passed
-                                oSecurity = ($elmer.type.obj.is($elmer.resolve($router, "elmer.security")) ?
-                                    $elmer.extend($router.elmer.security, oSecurity) :
-                                    oSecurity
-                                );
-
-                                //# Set bSecure based on if we have a oSecurity .obj
-                                bSecure = $elmer.type.obj.is(oSecurity);
+                                //# Set bSecure based on if we have a non-empty oConfig.security .obj
+                                bSecure = $elmer.type.bool.mk(oConfig.security, true) && $elmer.type.str.is(oConfig.security.mode, true);
 
                                 //#
                                 if ($elmer.type.str.is(sRoute)) {
@@ -107,21 +107,24 @@ module.exports = function ($elmer) {
                                         //#
                                         if (bSecure) {
                                             //#
-                                            switch($elmer.type.str.mk(oSecurity.mode).trim().toLowerCase()) {
+                                            //#     NOTE: Due to the bSecure test above, we know that .security.mode .is a .str so it's safe to .trim().toLowerCase() it
+                                            switch(oConfig.security.mode.trim().toLowerCase()) {
                                                 case "basic": {
                                                     $httpServer.use(
                                                         "/" + sRoute,
-                                                        require(__dirname + "/middleware/_basicauth.js")($elmer, oSecurity)
+                                                        require(__dirname + "/middleware/_basicauth.js")($elmer, oConfig.security)
                                                     );
                                                     break;
                                                 }
                                                 case "jwt": {
                                                     $httpServer.use(
                                                         "/" + sRoute,
-                                                        require(__dirname + "/middleware/_jwt.js")($elmer, oSecurity)
+                                                        require(__dirname + "/middleware/_jwt.js")($elmer, oConfig.security)
                                                     );
                                                     break;
                                                 }
+                                                //# oauth?
+                                                //# api key?
                                             }
                                         }
 
@@ -144,7 +147,12 @@ module.exports = function ($elmer) {
                                         oRoute = {
                                             route: sRoute,
                                             secure: bSecure,
+                                            config: oConfig,
                                             router: $router
+                                            //server:
+                                            //port:
+                                            //instance:
+                                            //id:
                                         };
                                         a_oRegisteredRoutes.push(oRoute);
                                     }
