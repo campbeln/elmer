@@ -95,6 +95,8 @@ module.exports = function ($elmer, oSecurityConfig) {
             $router.all('*', async (oRequest, oResponse) => {
                 oResponse.status(401).json($elmer.app.services.security.jwt.defaultError());
             }); //# /login/*
+
+            return $router;
         }, //# loginRouter
 
         login: async function login(oRequest, oResponse, eMode) {

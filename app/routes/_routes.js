@@ -71,6 +71,7 @@ module.exports = function ($elmer) {
     //# .register our $baseRouter then if we're .baseElmer the /login route
     $elmer.app.services.web.router.register("", $baseRouter /*, {} */);
     if ($elmer.app.config.baseElmer) {
+        require(__dirname + "/../middleware/_jwt.js")($elmer /*, {} */);
         $elmer.app.services.web.router.register("/login", $elmer.app.services.security.jwt.loginRouter() /*, {} */);
     }
 

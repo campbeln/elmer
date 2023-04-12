@@ -21,7 +21,7 @@ module.exports = function($elmer, $router /*, $baseRouter */) {
             sRouteName = $elmer.type.str.mk(oBody.route).toLowerCase(),
             oRoute = $elmer.type.query($elmer.app.data.proxy, { route: sRouteName }, { firstEntryOnly: true }),
             oConfig = $elmer.type.obj.mk(oBody.config),
-            bSecure = $elmer.type.bool.mk(oConfig.security, true) && $elmer.type.str.is(oConfig.security.mode, true),
+            bSecure = $elmer.type.obj.is(oConfig.security, true) && $elmer.type.str.is(oConfig.security.mode, true),
             bSuccess = false
         ;
 

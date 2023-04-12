@@ -164,7 +164,7 @@ console.log("error!!", err);
                                     //# If the bRouteExists
                                     if (!bRouteExists) {
                                         //# Set bSecure based on if the oElmerConfig.secure setting is a recognized security type
-                                        bSecure = $elmer.type.str.cmp(oElmerConfig.security.mode, ['basic', 'jwt']);
+                                        bSecure = $elmer.type.str.cmp($elmer.resolve(oElmerConfig, "security.mode"), ['basic', 'jwt']);
 
                                         //# If this is a bSecure route, determine the .mode and .use the appropriate middleware
                                         if (bSecure) {

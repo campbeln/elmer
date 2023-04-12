@@ -95,7 +95,7 @@ module.exports = function ($elmer) {
                                 }
 
                                 //# Set bSecure based on if we have a non-empty oConfig.security .obj
-                                bSecure = $elmer.type.bool.mk(oConfig.security, true) && $elmer.type.str.is(oConfig.security.mode, true);
+                                bSecure = $elmer.type.obj.is(oConfig.security, true) && $elmer.type.str.is(oConfig.security.mode, true);
 
                                 //#
                                 if ($elmer.type.str.is(sRoute)) {
