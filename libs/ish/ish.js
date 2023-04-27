@@ -1,7 +1,7 @@
 //################################################################################################
 /** @file Q: Are you using Vanilla Javascript?<br/>A: ...ish
  * <div style="font-size: 75%; margin-top: 20px;">
- *  Zero-dependency Javascript code snippets organized in an OOP structure, including:
+ *  JSish => `Zero-dependency OOP-organized Javascript code snippets, including:
  *  <ul>
  *      <li>Type-safety and type-casting - assisting developers in overcoming issues related to loose typing via Vanilla Javascript (rather than syntactic sugar à la TypeScript);</li>
  *      <li>OOP features - partial class definitions with shared private members and multiple inheritance;</li>
@@ -19,9 +19,9 @@
  *  with all non-UI features available both client-side (in-browser) and server-side (Node/etc.).
  *  <p style="margin-top: 20px;">
  *      All features are organized in individually includable mixins organized by namespace/major features with only the core <code>ish.js</code> functionality required to bootstrap.
- *  </p>
+ *  </p>`
  * </div>
- * @version 0.14.2021-04-24
+ * @version 0.14.2023-04-27
  * @author Nick Campbell
  * @license MIT
  * @copyright 2014-2021, Nick Campbell
@@ -46,7 +46,7 @@
         oPrivate = {},
         oTypeIsIsh = { //# Set the .ver and .target under .type.is.ish (done here so it's at the top of the file for easy editing) then stub out the .app and .lib with a new .pub oInterfaces for each
             config: {
-                ver: '0.13.2020-12-16',
+                ver: '0.14.2023-04-27',
                 onServer: bServerside,
                 debug: true,
                 //script: _undefined,
@@ -1788,27 +1788,54 @@
                 }, //# type.obj.ownKeys
 
                 //#########
-                /** Determines the value of the passed case-insensitive key within the passed value.
-                 * @$note As the key is searched for in a case-insensitive manor, the first matching lowercased key enumerated by the <code>for...in</code> statement will be returned.
+                /** Determines the value of the passed key within the passed value via a case-insensitive match, a <code>RegExp</code> match or truthy <code>function</code> return.
+                 * @$note As the key is searched for, the first matching key enumerated by the <code>for...in</code> statement will be returned unless <code>bReturnAllMatching</code> is set to <code>true</code>.
                  * @function ish.type.obj.get
-                 * @param {object} oSource Value to interrogate.
-                 * @param {string} sKey Key to retrieve from the passed value.
-                 * @returns {variant} Value representing the value of the passed case-insensitive key.
+                 * @param {object|function} oSource Value to interrogate.
+                 * @param {string|RegExp|function} vKey Value representing the key(s) to retrieve from the passed value or a <code>function(sCurrentKey)</code> returning truthy to indicate inclusion into the return value.
+                 * @param {boolean} [bReturnAllMatching=false] Value representing if multiple keys are to be retrieve from the passed value.
+                 * @returns {variant|variant[]} Value representing the value of the passed key or an array representing all values of the passed key.
                  */ //#####
-                get: function (oObject, sKey) {
-                    var sCurrentKey,
+                get: function (oSource, vKey, bReturnAllMatching) {
+                    var fnTest, sCurrentKey,
                         vReturnVal /* = _undefined */
                     ;
 
-                    //# If the caller passed in a valid oObject, .toLowerCase our sKey
-                    if (core.type.obj.is(oObject)) {
-                        sKey = core.type.str.mk(sKey).toLowerCase();
+                    //# If the caller passed in a valid oSource
+                    if (core.type.obj.is(oSource, { allowFn: true })) {
+                        //# If the passed vKey is a RegExp, setup fnTest accordingly
+                        if (core.type.is(vKey, RegExp)) {
+                            fnTest = function (sTestKey) {
+                                return vKey.test(sTestKey);
+                            };
+                        }
+                        //# Else if the passed vKey is a function, set it into fnTest
+                        if (core.type.is(vKey, RegExp)) {
+                            fnTest = vKey;
+                        }
+                        //# Else force vKey into a .str, .toLowerCase it and setup fnTest accordingly
+                        else {
+                            vKey = core.type.str.mk(vKey).toLowerCase();
+                            fnTest = function (sTestKey) {
+                                return (sTestKey.toLowerCase() === vKey);
+                            }
+                        }
 
-                        //# Traverse the oObject, returning the first matching .toLowerCase'd sCurrentKey
-                        for (sCurrentKey in oObject) {
-                            if (sCurrentKey.toLowerCase() === sKey) {
-                                vReturnVal = oObject[sCurrentKey];
-                                break;
+                        //# Traverse the oSource
+                        for (sCurrentKey in oSource) {
+                            //# If our fnTest matches on the sCurrentKey
+                            if (fnTest(sCurrentKey)) {
+                                //# If we are to bReturnAllMatching, .push it into our vReturnVal (ensuring vReturnVal is a valid array as we go)
+                                if (bReturnAllMatching) {
+                                    //vReturnVal[sCurrentKey] = oSource[sCurrentKey];
+                                    vReturnVal = (vReturnVal || []);
+                                    vReturnVal.push(oSource[sCurrentKey]);
+                                }
+                                //# Else we're to return only the first value, so set our vReturnVal and break from the loop
+                                else {
+                                    vReturnVal = oSource[sCurrentKey];
+                                    break;
+                                }
                             }
                         }
                     }

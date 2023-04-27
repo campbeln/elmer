@@ -2546,7 +2546,7 @@
                                     //# Traverse the a_sKeys for the oCurrent a_oX, determining the sFriendlyKeyName as we go
                                     for (j = 0; j < a_sKeys.length; j++) {
                                         sFriendlyKeyName = a_sKeys[j].replace(/[^a-z0-9_$]/gi, oOptions.replacementChar).replace(/^[0-9]{1,}/, oOptions.replacementChar);
-    
+
                                         //# If the oCurrent a_sKeys has non-friendly characters
                                         if (sFriendlyKeyName !== a_sKeys[j]) {
                                             //# If the sFriendlyKeyName already exists in our oCurrent a_oX, append as many sChar's as required to make it unique
@@ -2555,11 +2555,11 @@
                                                     sFriendlyKeyName += sChar;
                                                 } while (a_sKeys.indexOf(sFriendlyKeyName) !== -1);
                                             }
-    
+
                                             //# Place our sFriendlyKeyName mapping into oReplacedKeys and set a new value in the oCurrent a_oX
                                             oReplacedKeys[sFriendlyKeyName] = { original: a_sKeys[j], remapped: sFriendlyKeyName };
                                             oCurrent[sFriendlyKeyName] = oCurrent[a_sKeys[j]];
-    
+
                                             //# If we are to .deleteRekeyed, remove the a_sKeys[j] now
                                             if (oOptions.deleteRekeyed) {
                                                 delete oCurrent[a_sKeys[j]];
