@@ -174,9 +174,10 @@ then
     echo "####################"
     echo "# Updating..."
     echo "####################"
+    echo "# NOTE: Please run `sudo npm install npm@latest -g` to clear any NPM-related errors that may appear below."
 
     # npm update
-    npm install npm@latest -g
+    # npm install npm@latest -g
     npm update --save/--save-dev # https://jh3y.medium.com/how-to-update-all-npm-packages-in-your-project-at-once-17a8981860ea
     npm install
     npm audit fix --force
