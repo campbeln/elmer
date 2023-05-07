@@ -176,7 +176,7 @@ then
     echo "####################"
     echo "# Updating..."
     echo "####################"
-    echo "# NOTE: Please run `sudo npm install npm@latest -g` to clear any NPM-related errors that may appear below."
+    echo "# NOTE: Please run 'sudo npm install npm@latest -g' to clear any NPM-related errors that may appear below."
 
     # npm update
     # npm install npm@latest -g
