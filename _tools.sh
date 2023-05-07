@@ -92,10 +92,8 @@ flagEnv=$(node -e " \
 # Import the config.json variables into this script via export and into docker.env
 vars=""
 for keyval in  $(grep -E '": [^\{]' ./app/config/config.json | sed -e 's/: /=/' -e "s/\(\,\)$//"); do
-    # echo export $keyval
     eval export $keyval
     echo $keyval | sed 's/"//g' >> ./docker.env
-
     vars+="${keyval}${NEWLINE}"
 done;
 rm ./app/config/config.json
