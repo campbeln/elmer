@@ -85,7 +85,7 @@ flagEnv=$(node -e " \
             ) \
         ) \
     ; \
-    fs.writeFileSync('./app/config/config.json', JSON.stringify(oConfig)); \
+    fs.writeFileSync('./app/config/config.json', JSON.stringify(oConfig, null, 4)); \
     console.log(sEnv); \
 ")
 
@@ -95,6 +95,7 @@ for keyval in  $(grep -E '": [^\{]' ./app/config/config.json | sed -e 's/: /=/' 
     eval export $keyval
     echo $keyval | sed 's/"//g' >> ./docker.env
     vars+="${keyval}${NEWLINE}"
+    echo $keyval
 done;
 rm ./app/config/config.json
 
