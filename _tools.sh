@@ -95,7 +95,6 @@ for keyval in  $(grep -E '": [^\{]' ./app/config/config.json | sed -e 's/: /=/' 
     eval export $keyval
     echo $keyval | sed 's/"//g' >> ./docker.env
     vars+="${keyval}${NEWLINE}"
-    echo $keyval
 done;
 rm ./app/config/config.json
 
