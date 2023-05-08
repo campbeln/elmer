@@ -8,7 +8,9 @@
 
 NEWLINE=$'\n'
 #RED='\033[0;31m'
-BOLDBLACK='\033[1;30m'  # See: https://stackoverflow.com/a/28938235
+BLACKBOLD='\033[1;30m'  # See: https://stackoverflow.com/a/28938235
+GREENBOLD='\033[1;32m'
+BLUEBOLD='\033[1;34m'
 REDBOLD='\033[1;31m'
 RESET='\033[0m'         # No Color
 
@@ -104,9 +106,9 @@ rm ./app/config/config.json
 
 
 
-echo "########################################"
-echo "# ${name} => ${flagEnv}"
-echo "########################################"
+echo -e "${BLACKBOLD}######################################## ${RESET}"
+echo -e "${BLACKBOLD}#${GREENBOLD} ${name} ${BLACKBOLD}=>${BLUEBOLD} ${flagEnv} ${RESET}"
+echo -e "${BLACKBOLD}######################################## ${RESET}"
 
 
 
@@ -178,7 +180,7 @@ then
     echo "####################"
     echo "# Updating..."
     echo "####################"
-    echo -e "# ${BOLDBLACK}NOTE:${RESET} Run ${REDBOLD}sudo npm install npm@latest -g${RESET} to clear any NPM-related errors that may appear below."
+    echo -e "# ${BLACKBOLD}NOTE:${RESET} Run ${REDBOLD}sudo npm install npm@latest -g${RESET} to clear any NPM-related errors that may appear below."
 
     # npm update
     # npm install npm@latest -g
