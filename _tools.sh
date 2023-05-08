@@ -7,6 +7,10 @@
 # Version: 2023-05-07
 
 NEWLINE=$'\n'
+#RED='\033[0;31m'
+BOLDBLACK='\033[1;30m'  # See: https://stackoverflow.com/a/28938235
+REDBOLD='\033[1;31m'
+RESET='\033[0m'         # No Color
 
 # Loop through arguments and process them
 #     See: https://pretzelhands.com/posts/command-line-flags/ also https://www.baeldung.com/linux/use-command-line-arguments-in-bash-script
@@ -174,7 +178,7 @@ then
     echo "####################"
     echo "# Updating..."
     echo "####################"
-    echo "# NOTE: Please run 'sudo npm install npm@latest -g' to clear any NPM-related errors that may appear below."
+    echo -e "# ${BOLDBLACK}NOTE:${RESET} Run ${REDBOLD}sudo npm install npm@latest -g${RESET} to clear any NPM-related errors that may appear below."
 
     # npm update
     # npm install npm@latest -g
