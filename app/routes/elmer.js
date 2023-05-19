@@ -91,100 +91,60 @@ module.exports = function($elmer, $router /*, $baseRouter */) {
     });
 
 
-    //# TODO: Remove
-    $router.get("/proxy", async (oRequest, oResponse) => {
-        let oQuerystring = oRequest.querystring,
-            sRouteName = $elmer.type.str.mk(oQuerystring.route).toLowerCase(),
-            oRoute = $elmer.type.query($elmer.app.data.proxy, { route: sRouteName }, { firstEntryOnly: true }),
-            bSuccess = false
-        ;
-
-        //#
-        //oQuerystring.ip = ($elmer.io.net.ip.is(oQuerystring.ip) ? oQuerystring.ip : "0.0.0.0") || "0.0.0.0";
-
-        //#
-        if ($elmer.type.obj.is(oRoute)) {
-            //#
-            if ($elmer.type.bool.mk(oQuerystring.force, false) /* oQuerystring.force === oRoute.id */) {
-                bSuccess = true;
-                oRoute.ip = oQuerystring.ip;
-                oRoute.port = oQuerystring.port;
-                oRoute.instance++;
-                //oRoute.id = $elmer.type.uuid();
-            }
-        }
-        //#
-        else if ($elmer.app.data.proxy.disallowed.indexOf(sRouteName) === -1) {
-            bSuccess = true;
-            oRoute = {
-                route: sRouteName,
-                ip: oQuerystring.ip,
-                port: oQuerystring.port,
-                instance: 1,
-                id: $elmer.type.uuid()
-            };
-        }
-
-        //#
-        if (bSuccess) {
-            //#
-            oRoute = $elmer.extend(oRoute, $elmer.app.services.web.router.register(
-                sRouteName,
-                oRoute.ip + ":" + oRoute.port,
-                {} // $elmer.type.bool.mk(oQuerystring.secure, true)
-            ));
-            //console.log(oRoute.ip, ":" + oRoute.port, sRouteName);
-        }
-
-        oResponse.status(bSuccess ? $elmer.io.net.status.success.ok : $elmer.io.net.status.clientError.conflict).json(oRoute);
-    });
-
-
     //#
-    $router.get('/cache/:route', async (oRequest, oResponse) => {
-        let sRoute = oRequest.params.route,
-            iStatus = ($elmer.type.obj.is($elmer.resolve($elmer, ["cache", sRoute])) ? 200 : 404)
+    $router.get('/cache/id/:id', async (oRequest, oResponse) => {
+        let sID = oRequest.params.id,
+            a_oData = $elmer.type.query($elmer.app.cache, { trace: { id: sID } }),
+            iStatus = ($elmer.type.arr.is(a_oData, true) ? 200 : 404)
         ;
 
         oResponse.status(iStatus).json({
-            route: sRoute,
-            data: $elmer.cache[sRoute]
+            id: sID,
+            data: a_oData
         });
     });
 
 
     //#
-    $router.get('/cache/:route/:subroute', async (oRequest, oResponse) => {
-        let sRoute = oRequest.params.route,
-            sSubroute = oRequest.params.subroute,
-            iStatus = ($elmer.type.obj.is($elmer.resolve($elmer, ["cache", sRoute, sSubroute])) ? 200 : 404)
+    $router.get('/cache/clear/id/:id', async (oRequest, oResponse) => {
+        let sID = oRequest.params.id,
+            iStatus = ($elmer.type.obj.is($elmer.resolve($elmer.app.cache, sID)) ? 200 : 404),
+            bCleared = (iStatus === 200)
         ;
 
+        //#
+        if (bCleared) {
+            delete $elmer.app.cache[sID];
+        }
+
         oResponse.status(iStatus).json({
-            route: sRoute,
-            subroute: sSubroute,
-            data: $elmer.cache[sRoute][sSubroute]
+            id: sID,
+            cleared: bCleared
         });
     });
 
 
     //#
-    $router.get('/cache/:route/:subroute/:last', async (oRequest, oResponse) => {
-        let i,
-            a_oData = [],
-            sRoute = oRequest.params.route,
-            sSubroute = oRequest.params.subroute,
-            iLast = $elmer.type.int.mk(oRequest.params.last, 1),
-            a_oSubroute = $elmer.resolve($elmer, ["cache", sRoute, sSubroute]),
-            iStatus = ($elmer.type.obj.is($elmer.resolve($elmer, ["cache", sRoute, sSubroute])) ? 200 : 404)
+    $router.get('/cache/route/:route', async (oRequest, oResponse) => {
+        let sRoute = oRequest.params.route,
+            a_oData = $elmer.type.query($elmer.app.cache, { route: sRoute }),
+            iStatus = ($elmer.type.arr.is(a_oData, true) ? 200 : 404)
         ;
 
-        //#
-        if (iStatus === 200) {
-            for (i = a_oSubroute.length - iLast; i < a_oSubroute.length; i++) {
-                a_oData.push(a_oSubroute[i]);
-            }
-        }
+        oResponse.status(iStatus).json({
+            route: sRoute,
+            data: a_oData
+        });
+    });
+
+
+    //# TODO: Check :subroute value
+    $router.get('/cache/route/:route/:subroute', async (oRequest, oResponse) => {
+        let sRoute = oRequest.params.route,
+            sSubroute = oRequest.params.subroute,
+            a_oData = $elmer.type.query($elmer.app.cache, { route: sRoute, subroute: sSubroute }),
+            iStatus = ($elmer.type.arr.is(a_oData, true) ? 200 : 404)
+        ;
 
         oResponse.status(iStatus).json({
             route: sRoute,
@@ -195,13 +155,20 @@ module.exports = function($elmer, $router /*, $baseRouter */) {
 
 
     //#
-    $router.get('/cache/clear/:route', async (oRequest, oResponse) => {
-        let sRoute = oRequest.params.route,
-            iStatus = ($elmer.type.obj.is($elmer.resolve($elmer, ["cache", sRoute])) ? 200 : 404)
+    $router.get('/cache/clear/route/:route', async (oRequest, oResponse) => {
+        let i,
+            sRoute = oRequest.params.route,
+            a_oData = $elmer.type.query($elmer.app.cache, { route: sRoute }),
+            iStatus = ($elmer.type.arr.is(a_oData, true) ? 200 : 404),
+            bCleared = (iStatus === 200)
         ;
 
         //#
-        delete $elmer.cache[sRoute];
+        if (bCleared) {
+            for (i = 0; i < a_oData.length; i++) {
+                delete $elmer.app.cache[a_oData[i].trace.id];
+            }
+        }
 
         oResponse.status(iStatus).json({
             route: sRoute,
@@ -211,7 +178,31 @@ module.exports = function($elmer, $router /*, $baseRouter */) {
 
 
     //#
-    $router.get('/cache/clear/:route/:subroute', async (oRequest, oResponse) => {
+    $router.get('/cache/clear/route/:route/:subroute', async (oRequest, oResponse) => {
+        let i,
+            sRoute = oRequest.params.route,
+            sSubroute = oRequest.params.subroute,
+            a_oData = $elmer.type.query($elmer.app.cache, { route: sRoute, subroute: sSubroute }),
+            iStatus = ($elmer.type.arr.is(a_oData, true) ? 200 : 404),
+            bCleared = (iStatus === 200)
+        ;
+
+        //#
+        if (bCleared) {
+            for (i = 0; i < a_oData.length; i++) {
+                delete $elmer.app.cache[a_oData[i].trace.id];
+            }
+        }
+
+        oResponse.status(iStatus).json({
+            route: sRoute,
+            cleared: (iStatus === 200)
+        });
+    });
+
+
+    //#
+    $router.get('/cache/clear/before/:before', async (oRequest, oResponse) => {
         let i, dCurrentWhen,
             sRoute = oRequest.params.route,
             sSubroute = oRequest.params.subroute,

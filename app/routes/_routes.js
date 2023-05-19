@@ -23,14 +23,6 @@ module.exports = function ($elmer) {
                     $elmer.app.config.name + "." + $elmer.app.config.hostname :
                     $elmer.app.services.web.ip.address()                            //# SEE: https://www.abstractapi.com/guides/node-js-get-ip-address
                 ),
-                /*oAPIResponse = await $elmer.io.net.get(
-                    "http://" + $elmer.app.config.net + "." + $elmer.app.config.hostname + ":" + $elmer.app.config.port +
-                        "/elmer/proxy/?route=" + $elmer.app.config.name +
-                        "&port=" + $elmer.app.config.port +
-                        "&secure=" + $elmer.type.bool.mk($elmer.app.config.secure, false) +
-                        "&force=" + $elmer.type.bool.mk($elmer.app.config.forceRegister, true) +
-                        "&ip=" + sServer
-                ),*/
                 oAPIResponse = await $elmer.io.net.post(
                     "http://" + $elmer.app.config.net + "." + $elmer.app.config.hostname + ":" + $elmer.app.config.port + "/elmer/proxy/",
                     {
