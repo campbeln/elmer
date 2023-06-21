@@ -98,7 +98,7 @@ $httpServer.use($cookieParser());
 
 //# Support X-Request-Id's (or X-Correlation-Id's/X-Trace-Id's)
 $httpServer.use(
-    require(__dirname + "/middleware/_requestid.js")($elmer)
+    require(__dirname + "/app/middleware/_requestid.js")($elmer)
 );
 
 //# Setup the /www route for static content

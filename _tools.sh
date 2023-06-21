@@ -83,7 +83,7 @@ done
 
 # Use Javascript (and $ish) to format the base.json and requested env.json into a .obj.flatten'd JSON file so it can be exposed to the shell and Docker, returning the processed $flagEnv into the shell variable
 flagEnv=$(node -e " \
-    let ish = require('./libs/ish/ish.type.enum.js')(require('./libs/ish/ish.js')), \
+    let ish = require('./libs/ish/ish.type.type-ex.js')(require('./libs/ish/ish.js')), \
         fs = require('fs'), \
         sEnv = ( ['dev', 'prod'].indexOf('$flagEnv') === -1 ? 'dev' : '$flagEnv' ),
         oConfig = ish.type.obj.flatten( \
