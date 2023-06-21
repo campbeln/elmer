@@ -31,7 +31,10 @@ module.exports = function ($elmer) {
                 parentid: null,
                 generatedid: bIDPresent,
                 sync: true,
-                created: $elmer.type.date.timestamp
+                started: $elmer.type.date.timestamp(),
+                when: $elmer.type.date.format($elmer.type.date.utcToLocalOffset(), "YYYY-MM-DD HH:mm:ss"),
+                completed: null,
+                runtime: 0
             },
             oTrace
         );

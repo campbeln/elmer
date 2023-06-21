@@ -43,8 +43,8 @@ module.exports = function ($elmer, sRoute) {
                 sURL = oRequest.url,
                 oData = {
                     trace: oRequest.$trace,
-                    timestamp: Date.now(),
-                    when: $elmer.type.date.format($elmer.type.date.utcToLocalOffset(), "YYYY-MM-DD HH:mm:ss"),
+                    //timestamp: Date.now(),
+                    //when: $elmer.type.date.format($elmer.type.date.utcToLocalOffset(), "YYYY-MM-DD HH:mm:ss"),
                     route: sRoute,
                     subroute: "",
                     url: sURL,
@@ -53,6 +53,10 @@ module.exports = function ($elmer, sRoute) {
                     data: oResponseOrgRefs.responseJson
                 }
             ;
+
+            //#
+            oRequest.$trace.completed = $elmer.type.date.timestamp();
+            oRequest.$trace.runtime = $elmer.type.date.diff(oRequest.$trace.started, oRequest.$trace.completed, "s");
 
             //# If there are any querystring or hashtag element in the sURL, set iURL for removal
             if (sURL.indexOf("?") > -1) {
