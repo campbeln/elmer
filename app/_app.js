@@ -288,15 +288,9 @@ console.log("error!!", err);
                         }
 
                         //# .generate the $zip file
-                        /*buffZip = $zip.generate({
-                            type: "blob",
-                            compression: "DEFLATE",
-                            compressionOptions: {
-                                level: 6
-                            }
-                        });*/
                         buffZip = await $zip.generateAsync({
-                            type: "blob",
+                            //type: "blob",
+                            type: "nodebuffer",
                             compression: "DEFLATE",
                             compressionOptions: {
                                 level: 6
