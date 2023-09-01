@@ -721,7 +721,11 @@
     if (typeof module === 'object' && module.exports) { //if (typeof module !== 'undefined' && this.module !== module && module.exports) {
         module.exports = function (core) {
             //#     NOTE: FormData is included in NodeJS v18+ but the form-data npm package is required for versions below that
-            return init(core, require('node-fetch-commonjs'), FormData || require('form-data'));
+            try {
+                return init(core, require('node-fetch-commonjs'), FormData);
+            } catch (e) {
+                return init(core, require('node-fetch-commonjs'), require('form-data'));
+            }
         };
     }
     //# Else if we are running in an .amd environment, register as an anonymous module
