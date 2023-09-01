@@ -260,7 +260,7 @@ console.log("error!!", err);
                 baseDir: __dirname + "/../",
 
                 //#
-                zip: function (a_vFiles) {
+                zip: async function (a_vFiles) {
                     let vCurrent, buffZip, oReturnVal, i,
                         $zip = new $jszip()
                     ;
@@ -288,7 +288,14 @@ console.log("error!!", err);
                         }
 
                         //# .generate the $zip file
-                        buffZip = $zip.generate({
+                        /*buffZip = $zip.generate({
+                            type: "blob",
+                            compression: "DEFLATE",
+                            compressionOptions: {
+                                level: 6
+                            }
+                        });*/
+                        buffZip = await $zip.generateAsync({
                             type: "blob",
                             compression: "DEFLATE",
                             compressionOptions: {
