@@ -78,20 +78,56 @@ $httpServer.use($compression({
 //# If this is not .baseElmer, enable .json and .urlencoded $bodyParser
 //#     NOTE: As the $bodyParser consumes the posted body, we must exclude any proxied routes
 //#     SEE: https://stackoverflow.com/questions/28371641/how-can-i-use-express-http-proxy-after-bodyparser-json-has-been-called
-if (!$elmer.app.config.baseElmer) {
-    //# Support json-encoded bodies
-    $httpServer.use($bodyParser.json({
-        //type: "*/*",
-        //inflate: true,
-        limit: $elmer.app.config.uploadLimitMb + "mb"
-    }));
-
-    //# Support url-encoded bodies
-    $httpServer.use($bodyParser.urlencoded({
-        limit: $elmer.app.config.uploadLimitMb + "mb",
-        extended: true
-    }));
+/* */
+if ($elmer.app.config.baseElmer) {
+    $elmer.app.services.web.configBodyParser($bodyParser, "/elmer/*");
+    $elmer.app.services.web.configBodyParser($bodyParser, "/example/*");
 }
+else {
+    $elmer.app.services.web.configBodyParser($bodyParser);
+}
+// */
+/*
+$httpServer.use(function (oRequest, oResponse, fnNext) {
+    let sBaseRouteName = $elmer.type.str.mk(oRequest.path).trim().toLowerCase().split("/")[1];
+
+    //#
+    if ($elmer.app.data.proxy.disallowed.indexOf(sBaseRouteName) !== -1 || true) {
+        //# Support json-encoded bodies
+        $bodyParser.json({
+            //type: "* /*",
+            //inflate: true,
+            limit: $elmer.app.config.uploadLimitMb + "mb"
+        })(oRequest, oResponse, function () {});
+
+        //# Support url-encoded bodies
+        $bodyParser.urlencoded({
+            limit: $elmer.app.config.uploadLimitMb + "mb",
+            extended: true
+        })(oRequest, oResponse, function () {});
+    }
+
+    console.log("sBaseRouteName: " + sBaseRouteName + "; " + $elmer.app.data.proxy.disallowed.indexOf(sBaseRouteName), oRequest.body);
+
+    //#
+    fnNext();
+});
+// */
+//#
+/*else {
+    $httpServer.all('*', elmerBodyParser);
+
+    function elmerBodyParser(oRequest, res, next) {
+        let sRouteName = $elmer.type.str.mk(oRequest.path).toLowerCase().trim();
+
+        if ($elmer.app.data.proxy.disallowed.indexOf(sRouteName) !== -1) {
+            return next();
+        }
+
+        //authenticate user
+        next();
+    }
+}*/
 
 //# Support parsing cookies
 $httpServer.use($cookieParser());

@@ -15,7 +15,6 @@ module.exports = function ($elmer, sRoute) {
         let oResponseOrgRefs = {
                 status: oResponse.status,
                 json: oResponse.json,
-
                 statusCode: 200,
                 errorCode: 0,
                 responseJson: undefined

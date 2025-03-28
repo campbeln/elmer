@@ -11,7 +11,7 @@ const $expressProxy = require('express-http-proxy');
 
 
 module.exports = function ($elmer) {
-    $elmer.app.versionEx = "0.1.2023-04-04";
+    $elmer.app.versionEx = "0.1.2025-03-27";
 
     //#
     $elmer.extend($elmer.app, {
@@ -25,6 +25,33 @@ module.exports = function ($elmer) {
         },
         services: {
             web: {
+                //#
+                configBodyParser: function ($bodyParser, sRoute) {
+                    let $bodyParserJson = $bodyParser.json({
+                            //type: "*/*",
+                            //inflate: true,
+                            limit: $elmer.app.config.uploadLimitMb + "mb"
+                        }),
+                        $bodyParserUrlEncoded = $bodyParser.urlencoded({
+                            limit: $elmer.app.config.uploadLimitMb + "mb",
+                            extended: true
+                        })
+                    ;
+
+                    //#
+                    if ($elmer.type.str.is(sRoute)) {
+                        //# Support json-encoded & url-encoded bodies on the current sRoute only
+                        $elmer.app.services.web.server.use(sRoute, $bodyParserJson);
+                        $elmer.app.services.web.server.use(sRoute, $bodyParserUrlEncoded);
+                    }
+                    //#
+                    else {
+                        //# Support json-encoded & url-encoded bodies
+                        $elmer.app.services.web.server.use(sRoute, $bodyParserJson);
+                        $elmer.app.services.web.server.use($bodyParserUrlEncoded);
+                    }
+                }, //# bodyParser
+
                 //# Overload the existing $elmer.app.services.web.router with our baseElmer version
                 router: (function() {
                     let a_oRegisteredRoutes = [],
